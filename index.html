@@ -353,7 +353,6 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       margin: 12px 0;
-      margin-top: 32px;
       overflow: hidden;
       position: relative;
     }
@@ -393,12 +392,10 @@
     }
 
     .collapsible-actions {
-      position: absolute;
-      top: -28px;
-      right: 0;
       display: flex;
       gap: 6px;
-      z-index: 10;
+      margin-left: auto;
+      margin-right: 8px;
     }
 
     .collapsible-action-btn {
@@ -1087,21 +1084,21 @@
     // Section repliable
     function insertCollapsible() {
       const sectionHTML = `<div class="collapsible-section" contenteditable="false">
-          <div class="collapsible-actions">
-            <button class="collapsible-action-btn" onclick="copySection(event, this)" title="Copier la section">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="5" y="5" width="8" height="9" rx="1"/>
-                <path d="M11 5V3.5C11 3.22 10.78 3 10.5 3H3.5C3.22 3 3 3.22 3 3.5V10.5C3 10.78 3.22 11 3.5 11H5"/>
-              </svg>
-            </button>
-            <button class="collapsible-action-btn" onclick="deleteSection(event, this)" title="Supprimer la section">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M2 4h12M6 2h4M6 6v6M10 6v6M4 4l.5 9c0 .5.5 1 1 1h5c.5 0 1-.5 1-1l.5-9"/>
-              </svg>
-            </button>
-          </div>
           <div class="collapsible-header" onclick="toggleCollapsible(this)">
             <span contenteditable="true">Titre de la section</span>
+            <div class="collapsible-actions">
+              <button class="collapsible-action-btn" onclick="copySection(event, this)" title="Copier la section">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="5" width="8" height="9" rx="1"/>
+                  <path d="M11 5V3.5C11 3.22 10.78 3 10.5 3H3.5C3.22 3 3 3.22 3 3.5V10.5C3 10.78 3.22 11 3.5 11H5"/>
+                </svg>
+              </button>
+              <button class="collapsible-action-btn" onclick="deleteSection(event, this)" title="Supprimer la section">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 4h12M6 2h4M6 6v6M10 6v6M4 4l.5 9c0 .5.5 1 1 1h5c.5 0 1-.5 1-1l.5-9"/>
+                </svg>
+              </button>
+            </div>
             <span class="collapsible-arrow">▼</span>
           </div>
           <div class="collapsible-content" contenteditable="true">
