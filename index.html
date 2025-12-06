@@ -143,7 +143,8 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      min-height: 32px;
+      height: 32px;
+      min-width: 32px;
       vertical-align: middle;
     }
 
@@ -535,22 +536,25 @@
     <div class="toolbar">
       <div class="toolbar-group">
         <button class="toolbar-btn" onclick="execCmd('bold')" title="Gras (Ctrl+B)">
-          <strong>B</strong>
+          <strong style="font-size: 14px;">B</strong>
         </button>
         <button class="toolbar-btn" onclick="execCmd('italic')" title="Italique (Ctrl+I)">
-          <em>I</em>
+          <em style="font-size: 14px;">I</em>
         </button>
         <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)">
-          <u>U</u>
+          <u style="font-size: 14px;">U</u>
         </button>
         <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
-          🔗
+          <span style="font-size: 16px;">🔗</span>
         </button>
         <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
-          •
+          <span style="font-size: 18px; line-height: 1;">•</span>
         </button>
         <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
-          <span style="font-size: 12px;">▼</span>
+          <span style="font-size: 14px;">▼</span>
+        </button>
+        <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
+          <span style="font-size: 16px;">😀</span>
         </button>
       </div>
 
@@ -562,9 +566,6 @@
           <option value="h3">Titre 3</option>
           <option value="p">Paragraphe</option>
         </select>
-      </div>
-
-      <div class="toolbar-group">
         <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
           <option value="">Police</option>
           <option value="Roboto">Roboto</option>
@@ -573,9 +574,6 @@
           <option value="Arial">Arial</option>
           <option value="'Marianne', sans-serif">Marianne</option>
         </select>
-      </div>
-
-      <div class="toolbar-group">
         <div class="color-dropdown-wrapper">
           <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
             <span style="color: #000000; font-weight: bold; font-size: 16px; display: inline-block; line-height: 1;" id="currentColorIcon">A</span>
@@ -645,12 +643,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
-          😀
-        </button>
       </div>
 
       <div class="toolbar-group">
@@ -1056,8 +1048,7 @@
 
     // Section repliable
     function insertCollapsible() {
-      const sectionHTML = `<p><br></p>
-        <div class="collapsible-section" contenteditable="false">
+      const sectionHTML = `<div class="collapsible-section" contenteditable="false">
           <div class="collapsible-header" onclick="toggleCollapsible(this)">
             <span contenteditable="true">Titre de la section</span>
             <span class="collapsible-arrow">▼</span>
@@ -1141,6 +1132,28 @@
       document.getElementById('configMode').style.display = 'none';
       document.getElementById('displayMode').style.display = 'block';
     }
+
+
+    // Permettre la suppression des sections repliables avec Delete/Backspace
+    document.getElementById('editor').addEventListener('keydown', function(e) {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          let node = range.startContainer;
+          
+          // Remonter jusqu'à trouver la section repliable
+          while (node && node !== this) {
+            if (node.classList && node.classList.contains('collapsible-section')) {
+              e.preventDefault();
+              node.remove();
+              return;
+            }
+            node = node.parentNode;
+          }
+        }
+      }
+    });
 
     // Raccourcis clavier
     document.addEventListener('keydown', function(e) {
