@@ -126,6 +126,18 @@
       position: relative;
     }
 
+    .color-btn {
+      padding: 4px 6px !important;
+    }
+
+    .color-indicator {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
     .color-dropdown {
       display: none;
       position: absolute;
@@ -134,10 +146,10 @@
       background: white;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px;
+      padding: 8px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       z-index: 100;
-      min-width: 200px;
+      min-width: 180px;
       margin-top: 4px;
     }
 
@@ -147,48 +159,47 @@
 
     .color-presets {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
     }
 
     .color-preset {
-      width: 40px;
-      height: 40px;
-      border: 2px solid var(--border);
-      border-radius: 6px;
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
       cursor: pointer;
       transition: transform 0.2s;
+      padding: 0;
     }
 
     .color-preset:hover {
-      transform: scale(1.1);
+      transform: scale(1.15);
       border-color: var(--primary);
     }
 
     .color-custom {
       display: flex;
-      gap: 8px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
+      gap: 4px;
     }
 
     .color-custom input {
       flex: 1;
-      padding: 6px 10px;
+      padding: 4px 6px;
       border: 1px solid var(--border);
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .color-custom button {
-      padding: 6px 12px;
+      padding: 4px 10px;
       background: var(--primary);
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .color-custom button:hover {
@@ -459,6 +470,12 @@
         <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
           🔗
         </button>
+        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
+          •
+        </button>
+        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
+          ▼
+        </button>
       </div>
 
       <div class="toolbar-group">
@@ -472,7 +489,7 @@
       </div>
 
       <div class="toolbar-group">
-        <select class="toolbar-btn" onchange="execCmd('fontName', this.value); this.selectedIndex=0;">
+        <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
           <option value="">Police</option>
           <option value="Roboto">Roboto</option>
           <option value="Helvetica">Helvetica</option>
@@ -484,23 +501,35 @@
 
       <div class="toolbar-group">
         <div class="color-dropdown-wrapper">
-          <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
-            <span style="color: #000000;" id="currentColorIcon">A</span>
+          <button class="toolbar-btn color-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
+            <span class="color-indicator" id="currentColorIndicator" style="background: #000000;"></span>
           </button>
           <div id="colorDropdown" class="color-dropdown">
             <div class="color-presets">
               <button class="color-preset" style="background: #000000;" onclick="applyColor('#000000')" title="Noir"></button>
+              <button class="color-preset" style="background: #374151;" onclick="applyColor('#374151')" title="Gris foncé"></button>
               <button class="color-preset" style="background: #6B7280;" onclick="applyColor('#6B7280')" title="Gris"></button>
-              <button class="color-preset" style="background: #EF4444;" onclick="applyColor('#EF4444')" title="Rouge"></button>
+              <button class="color-preset" style="background: #9CA3AF;" onclick="applyColor('#9CA3AF')" title="Gris clair"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="applyColor('#DC2626')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="applyColor('#EF4444')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="applyColor('#EA580C')" title="Orange foncé"></button>
               <button class="color-preset" style="background: #F97316;" onclick="applyColor('#F97316')" title="Orange"></button>
-              <button class="color-preset" style="background: #F59E0B;" onclick="applyColor('#F59E0B')" title="Jaune"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyColor('#F59E0B')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="applyColor('#FBBF24')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="applyColor('#84CC16')" title="Lime"></button>
               <button class="color-preset" style="background: #10B981;" onclick="applyColor('#10B981')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyColor('#14B8A6')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="applyColor('#06B6D4')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="applyColor('#0EA5E9')" title="Bleu ciel"></button>
               <button class="color-preset" style="background: #3B82F6;" onclick="applyColor('#3B82F6')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="applyColor('#6366F1')" title="Indigo"></button>
               <button class="color-preset" style="background: #8B5CF6;" onclick="applyColor('#8B5CF6')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="applyColor('#A855F7')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="applyColor('#D946EF')" title="Fuchsia"></button>
               <button class="color-preset" style="background: #EC4899;" onclick="applyColor('#EC4899')" title="Rose"></button>
             </div>
             <div class="color-custom">
-              <input type="text" id="customColorInput" placeholder="#HEX ou nom" />
+              <input type="text" id="customColorInput" placeholder="#HEX" />
               <button onclick="applyCustomColor()">OK</button>
             </div>
           </div>
@@ -508,28 +537,19 @@
       </div>
 
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
-          • Puce
-        </button>
-        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
-          ▼ Section
-        </button>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="toggleEmojiPicker()" title="Insérer un emoji">
-          😀 Emoji
+        <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
+          😀
         </button>
       </div>
 
       <div class="toolbar-group">
         <button class="toolbar-btn" onclick="showImageModal()" title="Ajouter une image">
-          🖼️ Image
+          🖼️
         </button>
       </div>
 
       <div class="toolbar-group">
-        <select class="toolbar-btn" onchange="applyPadding(this.value); this.selectedIndex=0;" title="Marges">
+        <select class="toolbar-btn" id="paddingSelect" onchange="applyPadding(this.value)">
           <option value="">Marges</option>
           <option value="small">Petites</option>
           <option value="medium">Moyennes</option>
@@ -612,8 +632,22 @@
           // Charger le contenu existant
           const options = await grist.getOptions();
           const savedContent = options?.content || '';
+          const savedFont = options?.font || '';
+          const savedPadding = options?.padding || '';
+          
           document.getElementById('editor').innerHTML = savedContent;
           currentContent = savedContent;
+          
+          // Restaurer police et marges
+          if (savedFont) {
+            currentFont = savedFont;
+            applyFont(savedFont);
+          }
+          
+          if (savedPadding) {
+            currentPadding = savedPadding;
+            applyPadding(savedPadding);
+          }
           
           initializeEmojiPicker();
         }
@@ -624,7 +658,27 @@
         if (configMode.style.display === 'none') {
           const options = await grist.getOptions();
           const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
+          const savedFont = options?.font || '';
+          const savedPadding = options?.padding || '';
+          
           document.getElementById('displayContent').innerHTML = content;
+          
+          // Appliquer police et marges en mode affichage
+          if (savedFont) {
+            document.getElementById('displayContent').style.fontFamily = savedFont;
+          }
+          
+          if (savedPadding) {
+            let padding;
+            switch(savedPadding) {
+              case 'small': padding = '10px'; break;
+              case 'medium': padding = '20px'; break;
+              case 'large': padding = '40px'; break;
+            }
+            if (padding) {
+              document.getElementById('displayContent').style.padding = padding;
+            }
+          }
           
           // Réinitialiser les sections repliables
           initCollapsibles();
@@ -639,7 +693,12 @@
     }
 
     // Gestion des liens
+    let savedSelection = null;
+    
     function showLinkModal() {
+      // Sauvegarder la sélection actuelle
+      savedSelection = saveSelection();
+      
       document.getElementById('linkModal').classList.add('active');
       document.getElementById('linkText').value = '';
       document.getElementById('linkUrl').value = '';
@@ -655,17 +714,46 @@
 
     function closeLinkModal() {
       document.getElementById('linkModal').classList.remove('active');
+      savedSelection = null;
+    }
+
+    function saveSelection() {
+      if (window.getSelection) {
+        const sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          return sel.getRangeAt(0);
+        }
+      }
+      return null;
+    }
+
+    function restoreSelection(range) {
+      if (range) {
+        if (window.getSelection) {
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
     }
 
     function insertLink() {
-      const text = document.getElementById('linkText').value;
-      const url = document.getElementById('linkUrl').value;
+      const text = document.getElementById('linkText').value.trim();
+      const url = document.getElementById('linkUrl').value.trim();
       
       if (text && url) {
+        const editor = document.getElementById('editor');
+        editor.focus();
+        
+        // Restaurer la sélection si elle existe
+        if (savedSelection) {
+          restoreSelection(savedSelection);
+        }
+        
         const link = `<a href="${url}" target="_blank">${text}</a>`;
         document.execCommand('insertHTML', false, link);
+        
         closeLinkModal();
-        document.getElementById('editor').focus();
       }
     }
 
@@ -684,21 +772,24 @@
       const url = document.getElementById('imageUrl').value.trim();
       
       if (url) {
-        // Vérifier si une image existe déjà
         const editor = document.getElementById('editor');
         const existingImage = editor.querySelector('img');
         
         if (existingImage) {
           if (confirm('Une image existe déjà. La remplacer ?')) {
             existingImage.src = url;
+            existingImage.style.maxWidth = '100%';
+            existingImage.style.height = 'auto';
+            existingImage.style.margin = '16px 0';
+            existingImage.style.borderRadius = '8px';
           }
         } else {
-          const img = `<img src="${url}" style="max-width: 100%; height: auto; margin: 16px 0; border-radius: 8px;" />`;
+          editor.focus();
+          const img = `<img src="${url}" style="max-width: 100%; height: auto; margin: 16px 0; border-radius: 8px; display: block;" alt="Image" />`;
           document.execCommand('insertHTML', false, img);
         }
         
         closeImageModal();
-        document.getElementById('editor').focus();
       }
     }
 
@@ -711,7 +802,7 @@
     function applyColor(color) {
       document.getElementById('editor').focus();
       document.execCommand('foreColor', false, color);
-      document.getElementById('currentColorIcon').style.color = color;
+      document.getElementById('currentColorIndicator').style.background = color;
       document.getElementById('colorDropdown').classList.remove('active');
     }
 
@@ -735,8 +826,28 @@
       }
     });
 
+    // Gestion de la police (applique à tout le texte)
+    let currentFont = '';
+    
+    function applyFont(font) {
+      if (!font) return;
+      
+      const editor = document.getElementById('editor');
+      const displayContent = document.getElementById('displayContent');
+      
+      editor.style.fontFamily = font;
+      displayContent.style.fontFamily = font;
+      
+      currentFont = font;
+      document.getElementById('fontSelect').value = font;
+    }
+
     // Gestion des marges
+    let currentPadding = '';
+    
     function applyPadding(size) {
+      if (!size) return;
+      
       const editor = document.getElementById('editor');
       const displayContent = document.getElementById('displayContent');
       
@@ -757,6 +868,9 @@
       
       editor.style.padding = padding;
       displayContent.style.padding = padding;
+      
+      currentPadding = size;
+      document.getElementById('paddingSelect').value = size;
     }
 
     // Gestion des emojis
@@ -773,9 +887,20 @@
       });
     }
 
-    function toggleEmojiPicker() {
+    function toggleEmojiPicker(event) {
       const picker = document.getElementById('emojiPicker');
-      picker.classList.toggle('active');
+      
+      if (picker.classList.contains('active')) {
+        picker.classList.remove('active');
+      } else {
+        const btn = event.target.closest('.toolbar-btn');
+        const rect = btn.getBoundingClientRect();
+        
+        picker.style.top = (rect.bottom + 4) + 'px';
+        picker.style.left = rect.left + 'px';
+        
+        picker.classList.add('active');
+      }
     }
 
     function insertEmoji(emoji) {
@@ -831,13 +956,32 @@
       const content = document.getElementById('editor').innerHTML;
       
       await grist.setOptions({
-        content: content
+        content: content,
+        font: currentFont,
+        padding: currentPadding
       });
       
       // Retour au mode affichage
       document.getElementById('configMode').style.display = 'none';
       document.getElementById('displayMode').style.display = 'block';
       document.getElementById('displayContent').innerHTML = content;
+      
+      // Appliquer police et marges en mode affichage
+      if (currentFont) {
+        document.getElementById('displayContent').style.fontFamily = currentFont;
+      }
+      
+      if (currentPadding) {
+        let padding;
+        switch(currentPadding) {
+          case 'small': padding = '10px'; break;
+          case 'medium': padding = '20px'; break;
+          case 'large': padding = '40px'; break;
+        }
+        if (padding) {
+          document.getElementById('displayContent').style.padding = padding;
+        }
+      }
       
       initCollapsibles();
     }
