@@ -126,18 +126,6 @@
       position: relative;
     }
 
-    .color-btn {
-      padding: 4px 6px !important;
-    }
-
-    .color-indicator {
-      display: block;
-      width: 20px;
-      height: 20px;
-      border-radius: 3px;
-      border: 1px solid var(--border);
-    }
-
     .color-dropdown {
       display: none;
       position: absolute;
@@ -271,6 +259,30 @@
     #editor a {
       color: var(--primary);
       text-decoration: underline;
+    }
+
+    /* Styles des tableaux */
+    #editor table,
+    .display-content table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+    }
+
+    #editor th,
+    #editor td,
+    .display-content th,
+    .display-content td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    #editor th,
+    .display-content th {
+      background: var(--hover);
+      font-weight: 600;
     }
 
     /* Section repliable */
@@ -474,7 +486,7 @@
           •
         </button>
         <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
-          ▼
+          <span style="font-size: 12px;">▼</span>
         </button>
       </div>
 
@@ -501,8 +513,8 @@
 
       <div class="toolbar-group">
         <div class="color-dropdown-wrapper">
-          <button class="toolbar-btn color-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
-            <span class="color-indicator" id="currentColorIndicator" style="background: #000000;"></span>
+          <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
+            <span style="color: #000000; font-weight: bold; font-size: 16px;" id="currentColorIcon">A</span>
           </button>
           <div id="colorDropdown" class="color-dropdown">
             <div class="color-presets">
@@ -534,11 +546,52 @@
             </div>
           </div>
         </div>
+
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de fond du texte">
+            <span style="background: rgba(255, 255, 0, 0.3); padding: 2px 4px; font-weight: bold; font-size: 16px;" id="currentBgColorIcon">A</span>
+          </button>
+          <div id="bgColorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: rgba(0, 0, 0, 0.1);" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
+              <button class="color-preset" style="background: rgba(55, 65, 81, 0.15);" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: rgba(107, 114, 128, 0.15);" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
+              <button class="color-preset" style="background: rgba(156, 163, 175, 0.2);" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
+              <button class="color-preset" style="background: rgba(220, 38, 38, 0.2);" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
+              <button class="color-preset" style="background: rgba(239, 68, 68, 0.2);" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: rgba(234, 88, 12, 0.2);" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: rgba(249, 115, 22, 0.2);" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
+              <button class="color-preset" style="background: rgba(245, 158, 11, 0.2);" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
+              <button class="color-preset" style="background: rgba(251, 191, 36, 0.3);" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
+              <button class="color-preset" style="background: rgba(132, 204, 22, 0.2);" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
+              <button class="color-preset" style="background: rgba(16, 185, 129, 0.2);" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
+              <button class="color-preset" style="background: rgba(20, 184, 166, 0.2);" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
+              <button class="color-preset" style="background: rgba(6, 182, 212, 0.2);" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
+              <button class="color-preset" style="background: rgba(14, 165, 233, 0.2);" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: rgba(59, 130, 246, 0.2);" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
+              <button class="color-preset" style="background: rgba(99, 102, 241, 0.2);" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
+              <button class="color-preset" style="background: rgba(139, 92, 246, 0.2);" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
+              <button class="color-preset" style="background: rgba(168, 85, 247, 0.2);" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
+              <button class="color-preset" style="background: rgba(217, 70, 239, 0.2);" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: rgba(236, 72, 153, 0.2);" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
+            </div>
+            <div class="color-custom">
+              <input type="text" id="customBgColorInput" placeholder="#HEX" />
+              <button onclick="applyCustomBgColor()">OK</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="toolbar-group">
         <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
           😀
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="showTableModal()" title="Insérer un tableau">
+          ⊞
         </button>
       </div>
 
@@ -595,6 +648,27 @@
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeImageModal()">Annuler</button>
         <button class="btn-primary" onclick="insertImage()">Insérer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour les tableaux -->
+  <div id="tableModal" class="modal">
+    <div class="modal-content">
+      <h3>Insérer un tableau</h3>
+      <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+        <div style="flex: 1;">
+          <label style="font-size: 14px; color: var(--text-light); display: block; margin-bottom: 4px;">Lignes</label>
+          <input type="number" id="tableRows" min="1" max="20" value="3" style="width: 100%;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 14px; color: var(--text-light); display: block; margin-bottom: 4px;">Colonnes</label>
+          <input type="number" id="tableCols" min="1" max="10" value="3" style="width: 100%;">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeTableModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertTable()">Insérer</button>
       </div>
     </div>
   </div>
@@ -739,9 +813,14 @@
 
     function insertLink() {
       const text = document.getElementById('linkText').value.trim();
-      const url = document.getElementById('linkUrl').value.trim();
+      let url = document.getElementById('linkUrl').value.trim();
       
       if (text && url) {
+        // Ajouter https:// si aucun protocole n'est spécifié
+        if (!url.match(/^https?:\/\//i)) {
+          url = 'https://' + url;
+        }
+        
         const editor = document.getElementById('editor');
         editor.focus();
         
@@ -750,7 +829,7 @@
           restoreSelection(savedSelection);
         }
         
-        const link = `<a href="${url}" target="_blank">${text}</a>`;
+        const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
         document.execCommand('insertHTML', false, link);
         
         closeLinkModal();
@@ -769,9 +848,14 @@
     }
 
     function insertImage() {
-      const url = document.getElementById('imageUrl').value.trim();
+      let url = document.getElementById('imageUrl').value.trim();
       
       if (url) {
+        // Ajouter https:// si aucun protocole n'est spécifié et ce n'est pas du base64
+        if (!url.match(/^(https?:\/\/|data:)/i)) {
+          url = 'https://' + url;
+        }
+        
         const editor = document.getElementById('editor');
         const existingImage = editor.querySelector('img');
         
@@ -782,27 +866,89 @@
             existingImage.style.height = 'auto';
             existingImage.style.margin = '16px 0';
             existingImage.style.borderRadius = '8px';
+            existingImage.style.display = 'block';
           }
         } else {
           editor.focus();
-          const img = `<img src="${url}" style="max-width: 100%; height: auto; margin: 16px 0; border-radius: 8px; display: block;" alt="Image" />`;
-          document.execCommand('insertHTML', false, img);
+          // Créer un élément img directement plutôt que via insertHTML
+          const imgElement = document.createElement('img');
+          imgElement.src = url;
+          imgElement.style.maxWidth = '100%';
+          imgElement.style.height = 'auto';
+          imgElement.style.margin = '16px 0';
+          imgElement.style.borderRadius = '8px';
+          imgElement.style.display = 'block';
+          imgElement.alt = 'Image';
+          
+          // Insérer l'élément
+          const selection = window.getSelection();
+          if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.insertNode(imgElement);
+            range.collapse(false);
+          } else {
+            editor.appendChild(imgElement);
+          }
         }
         
         closeImageModal();
       }
     }
 
+    // Gestion des tableaux
+    function showTableModal() {
+      document.getElementById('tableModal').classList.add('active');
+      document.getElementById('tableRows').value = 3;
+      document.getElementById('tableCols').value = 3;
+      document.getElementById('tableRows').focus();
+    }
+
+    function closeTableModal() {
+      document.getElementById('tableModal').classList.remove('active');
+    }
+
+    function insertTable() {
+      const rows = parseInt(document.getElementById('tableRows').value);
+      const cols = parseInt(document.getElementById('tableCols').value);
+      
+      if (rows > 0 && cols > 0 && rows <= 20 && cols <= 10) {
+        let tableHTML = '<table><thead><tr>';
+        
+        // En-têtes
+        for (let i = 0; i < cols; i++) {
+          tableHTML += '<th>Colonne ' + (i + 1) + '</th>';
+        }
+        tableHTML += '</tr></thead><tbody>';
+        
+        // Corps
+        for (let i = 0; i < rows; i++) {
+          tableHTML += '<tr>';
+          for (let j = 0; j < cols; j++) {
+            tableHTML += '<td><br></td>';
+          }
+          tableHTML += '</tr>';
+        }
+        tableHTML += '</tbody></table><p><br></p>';
+        
+        document.getElementById('editor').focus();
+        document.execCommand('insertHTML', false, tableHTML);
+        
+        closeTableModal();
+      }
+    }
+
     // Gestion du color dropdown
     function toggleColorDropdown() {
       const dropdown = document.getElementById('colorDropdown');
+      const bgDropdown = document.getElementById('bgColorDropdown');
+      bgDropdown.classList.remove('active');
       dropdown.classList.toggle('active');
     }
 
     function applyColor(color) {
       document.getElementById('editor').focus();
       document.execCommand('foreColor', false, color);
-      document.getElementById('currentColorIndicator').style.background = color;
+      document.getElementById('currentColorIcon').style.color = color;
       document.getElementById('colorDropdown').classList.remove('active');
     }
 
@@ -816,13 +962,51 @@
       }
     }
 
-    // Fermer le color dropdown si on clique ailleurs
-    document.addEventListener('click', function(e) {
-      const dropdown = document.getElementById('colorDropdown');
-      const colorBtn = e.target.closest('[onclick*="toggleColorDropdown"]');
+    // Gestion du background color dropdown
+    function toggleBgColorDropdown() {
+      const dropdown = document.getElementById('bgColorDropdown');
+      const colorDropdown = document.getElementById('colorDropdown');
+      colorDropdown.classList.remove('active');
+      dropdown.classList.toggle('active');
+    }
+
+    function applyBgColor(color) {
+      document.getElementById('editor').focus();
+      document.execCommand('backColor', false, color);
+      document.getElementById('currentBgColorIcon').style.background = color;
+      document.getElementById('bgColorDropdown').classList.remove('active');
+    }
+
+    function applyCustomBgColor() {
+      const input = document.getElementById('customBgColorInput');
+      let color = input.value.trim();
       
-      if (dropdown && !dropdown.contains(e.target) && !colorBtn) {
-        dropdown.classList.remove('active');
+      if (color) {
+        // Convertir hex en rgba si nécessaire
+        if (color.match(/^#[0-9A-F]{6}$/i)) {
+          const r = parseInt(color.slice(1, 3), 16);
+          const g = parseInt(color.slice(3, 5), 16);
+          const b = parseInt(color.slice(5, 7), 16);
+          color = `rgba(${r}, ${g}, ${b}, 0.2)`;
+        }
+        applyBgColor(color);
+        input.value = '';
+      }
+    }
+
+    // Fermer les dropdowns si on clique ailleurs
+    document.addEventListener('click', function(e) {
+      const colorDropdown = document.getElementById('colorDropdown');
+      const bgColorDropdown = document.getElementById('bgColorDropdown');
+      const colorBtn = e.target.closest('[onclick*="toggleColorDropdown"]');
+      const bgColorBtn = e.target.closest('[onclick*="toggleBgColorDropdown"]');
+      
+      if (colorDropdown && !colorDropdown.contains(e.target) && !colorBtn) {
+        colorDropdown.classList.remove('active');
+      }
+      
+      if (bgColorDropdown && !bgColorDropdown.contains(e.target) && !bgColorBtn) {
+        bgColorDropdown.classList.remove('active');
       }
     });
 
@@ -835,11 +1019,25 @@
       const editor = document.getElementById('editor');
       const displayContent = document.getElementById('displayContent');
       
+      // Appliquer la police directement au conteneur
       editor.style.fontFamily = font;
       displayContent.style.fontFamily = font;
       
+      // Pour appliquer aussi au contenu existant, on wrapp tout dans un span
+      // mais seulement si c'est lors de l'édition
+      if (editor.innerHTML && editor.style.display !== 'none') {
+        // Nettoyer les anciens spans de police
+        const content = editor.innerHTML;
+        editor.innerHTML = content;
+      }
+      
       currentFont = font;
-      document.getElementById('fontSelect').value = font;
+      
+      // Mettre à jour le select
+      const fontSelect = document.getElementById('fontSelect');
+      if (fontSelect) {
+        fontSelect.value = font;
+      }
     }
 
     // Gestion des marges
