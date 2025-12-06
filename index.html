@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grist Text Editor Widget</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -36,7 +37,10 @@
     }
 
     .config-header {
-      margin-bottom: 24px;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+      gap: 12px;
     }
 
     .config-header h1 {
@@ -48,6 +52,11 @@
     .config-header p {
       color: var(--text-light);
       font-size: 14px;
+    }
+
+    .config-actions {
+      display: flex;
+      gap: 12px;
     }
 
     /* Toolbar */
@@ -84,9 +93,7 @@
       transition: all 0.2s;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 4px;
-      min-height: 32px;
     }
 
     .toolbar-btn:hover {
@@ -112,6 +119,79 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       cursor: pointer;
+    }
+
+    /* Color Dropdown */
+    .color-dropdown-wrapper {
+      position: relative;
+    }
+
+    .color-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      min-width: 180px;
+      margin-top: 4px;
+    }
+
+    .color-dropdown.active {
+      display: block;
+    }
+
+    .color-presets {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .color-preset {
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      padding: 0;
+    }
+
+    .color-preset:hover {
+      transform: scale(1.15);
+      border-color: var(--primary);
+    }
+
+    .color-custom {
+      display: flex;
+      gap: 4px;
+    }
+
+    .color-custom input {
+      flex: 1;
+      padding: 4px 6px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .color-custom button {
+      padding: 4px 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .color-custom button:hover {
+      background: var(--primary-hover);
     }
 
     /* Editor */
@@ -160,10 +240,19 @@
 
     #editor ul {
       margin: 8px 0;
-      padding-left: 24px;
+      padding-left: 40px;
     }
 
     #editor li {
+      margin: 4px 0;
+    }
+
+    .display-content ul {
+      margin: 8px 0;
+      padding-left: 40px;
+    }
+
+    .display-content li {
       margin: 4px 0;
     }
 
@@ -172,12 +261,28 @@
       text-decoration: underline;
     }
 
-    #editor img {
-      max-width: 100%;
-      height: auto;
-      display: block;
+    /* Styles des tableaux */
+    #editor table,
+    .display-content table {
+      border-collapse: collapse;
+      width: 100%;
       margin: 16px 0;
-      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    #editor th,
+    #editor td,
+    .display-content th,
+    .display-content td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    #editor th,
+    .display-content th {
+      background: var(--hover);
+      font-weight: 600;
     }
 
     /* Section repliable */
@@ -329,8 +434,7 @@
       padding: 12px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       z-index: 100;
-      width: 280px;
-      right: 0;
+      max-width: 300px;
       grid-template-columns: repeat(8, 1fr);
       gap: 4px;
     }
@@ -358,8 +462,10 @@
   <!-- Mode Configuration -->
   <div id="configMode" class="config-mode" style="display: none;">
     <div class="config-header">
-      <h1>📝 Éditeur de texte riche</h1>
-      <p>Créez et formatez votre contenu</p>
+      <div class="config-actions">
+        <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
+        <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
+      </div>
     </div>
 
     <div class="toolbar">
@@ -372,6 +478,15 @@
         </button>
         <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)">
           <u>U</u>
+        </button>
+        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
+          🔗
+        </button>
+        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
+          •
+        </button>
+        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
+          <span style="font-size: 12px;">▼</span>
         </button>
       </div>
 
@@ -386,45 +501,113 @@
       </div>
 
       <div class="toolbar-group">
-        <select class="toolbar-btn" onchange="execCmd('fontName', this.value); this.selectedIndex=0;">
+        <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
           <option value="">Police</option>
           <option value="Roboto">Roboto</option>
           <option value="Helvetica">Helvetica</option>
           <option value="Verdana">Verdana</option>
           <option value="Arial">Arial</option>
-          <option value="Marianne">Marianne (réservée à l'État)</option>
+          <option value="'Marianne', sans-serif">Marianne</option>
         </select>
       </div>
 
       <div class="toolbar-group">
-        <input type="color" id="colorPicker" onchange="execCmd('foreColor', this.value)" title="Couleur du texte">
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
+            <span style="color: #000000; font-weight: bold; font-size: 16px;" id="currentColorIcon">A</span>
+          </button>
+          <div id="colorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: #000000;" onclick="applyColor('#000000')" title="Noir"></button>
+              <button class="color-preset" style="background: #374151;" onclick="applyColor('#374151')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #6B7280;" onclick="applyColor('#6B7280')" title="Gris"></button>
+              <button class="color-preset" style="background: #9CA3AF;" onclick="applyColor('#9CA3AF')" title="Gris clair"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="applyColor('#DC2626')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="applyColor('#EF4444')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="applyColor('#EA580C')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="applyColor('#F97316')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyColor('#F59E0B')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="applyColor('#FBBF24')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="applyColor('#84CC16')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="applyColor('#10B981')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyColor('#14B8A6')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="applyColor('#06B6D4')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="applyColor('#0EA5E9')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="applyColor('#3B82F6')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="applyColor('#6366F1')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="applyColor('#8B5CF6')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="applyColor('#A855F7')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="applyColor('#D946EF')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="applyColor('#EC4899')" title="Rose"></button>
+            </div>
+            <div class="color-custom">
+              <input type="text" id="customColorInput" placeholder="#HEX" />
+              <button onclick="applyCustomColor()">OK</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de fond du texte">
+            <span style="background: rgba(255, 255, 0, 0.3); padding: 2px 4px; font-weight: bold; font-size: 16px;" id="currentBgColorIcon">A</span>
+          </button>
+          <div id="bgColorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: rgba(0, 0, 0, 0.1);" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
+              <button class="color-preset" style="background: rgba(55, 65, 81, 0.15);" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: rgba(107, 114, 128, 0.15);" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
+              <button class="color-preset" style="background: rgba(156, 163, 175, 0.2);" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
+              <button class="color-preset" style="background: rgba(220, 38, 38, 0.2);" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
+              <button class="color-preset" style="background: rgba(239, 68, 68, 0.2);" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: rgba(234, 88, 12, 0.2);" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: rgba(249, 115, 22, 0.2);" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
+              <button class="color-preset" style="background: rgba(245, 158, 11, 0.2);" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
+              <button class="color-preset" style="background: rgba(251, 191, 36, 0.3);" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
+              <button class="color-preset" style="background: rgba(132, 204, 22, 0.2);" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
+              <button class="color-preset" style="background: rgba(16, 185, 129, 0.2);" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
+              <button class="color-preset" style="background: rgba(20, 184, 166, 0.2);" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
+              <button class="color-preset" style="background: rgba(6, 182, 212, 0.2);" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
+              <button class="color-preset" style="background: rgba(14, 165, 233, 0.2);" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: rgba(59, 130, 246, 0.2);" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
+              <button class="color-preset" style="background: rgba(99, 102, 241, 0.2);" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
+              <button class="color-preset" style="background: rgba(139, 92, 246, 0.2);" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
+              <button class="color-preset" style="background: rgba(168, 85, 247, 0.2);" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
+              <button class="color-preset" style="background: rgba(217, 70, 239, 0.2);" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: rgba(236, 72, 153, 0.2);" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
+            </div>
+            <div class="color-custom">
+              <input type="text" id="customBgColorInput" placeholder="#HEX" />
+              <button onclick="applyCustomBgColor()">OK</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
-          • Liste
+        <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
+          😀
         </button>
       </div>
 
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
-          🔗 Lien
+        <button class="toolbar-btn" onclick="showTableModal()" title="Insérer un tableau">
+          ⊞
         </button>
+      </div>
+
+      <div class="toolbar-group">
         <button class="toolbar-btn" onclick="showImageModal()" title="Ajouter une image">
-          🖼️ Image
+          🖼️
         </button>
       </div>
 
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="toggleEmojiPicker()" title="Insérer un emoji">
-          😀 Emoji
-        </button>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
-          ▼ Section
-        </button>
+        <select class="toolbar-btn" id="paddingSelect" onchange="applyPadding(this.value)">
+          <option value="">Marges</option>
+          <option value="small">Petites</option>
+          <option value="medium">Moyennes</option>
+          <option value="large">Grandes</option>
+        </select>
       </div>
     </div>
 
@@ -434,11 +617,6 @@
 
     <!-- Emoji Picker -->
     <div id="emojiPicker" class="emoji-picker"></div>
-
-    <div class="config-actions">
-      <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
-      <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
-    </div>
   </div>
 
   <!-- Mode Display -->
@@ -463,7 +641,10 @@
   <div id="imageModal" class="modal">
     <div class="modal-content">
       <h3>Ajouter une image</h3>
-      <input type="url" id="imageUrl" placeholder="URL de l'image (https://...)">
+      <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">
+        URL de l'image ou encodage base64
+      </p>
+      <input type="text" id="imageUrl" placeholder="https://exemple.com/image.jpg ou data:image/...">
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeImageModal()">Annuler</button>
         <button class="btn-primary" onclick="insertImage()">Insérer</button>
@@ -471,57 +652,113 @@
     </div>
   </div>
 
+  <!-- Modal pour les tableaux -->
+  <div id="tableModal" class="modal">
+    <div class="modal-content">
+      <h3>Insérer un tableau</h3>
+      <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+        <div style="flex: 1;">
+          <label style="font-size: 14px; color: var(--text-light); display: block; margin-bottom: 4px;">Lignes</label>
+          <input type="number" id="tableRows" min="1" max="20" value="3" style="width: 100%;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 14px; color: var(--text-light); display: block; margin-bottom: 4px;">Colonnes</label>
+          <input type="number" id="tableCols" min="1" max="10" value="3" style="width: 100%;">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeTableModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertTable()">Insérer</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    let grist;
     let currentContent = '';
+    const configMode = document.getElementById('configMode');
+    const displayMode = document.getElementById('displayMode');
     
-    // Emojis populaires - ajout des emojis sociaux en début
+    // Emojis professionnels
     const emojis = [
-      '😀', '👍', '👎', '🤝', '👏', '🙏', '💪', '✌️',
-      '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
-      '😂', '🤣', '😅', '😆', '😉', '😌', '😔', '😢',
-      '👋', '🙌', '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍',
-      '⭐', '✨', '💫', '🔥', '💥', '✅', '❌', '⚠️',
-      '📝', '📌', '📍', '🔔', '💡', '🎯', '🎉', '🎊'
+      '📊', '📈', '📉', '💼', '🏢', '🏭', '🏗️', '⚙️',
+      '🔧', '🔨', '🛠️', '📋', '📌', '📍', '📎', '✂️',
+      '📁', '📂', '🗂️', '📅', '📆', '🗓️', '⏰', '⏱️',
+      '✅', '❌', '⚠️', '⛔', '🚫', '💡', '🔔', '📢',
+      '🎯', '🎓', '🏆', '🥇', '🥈', '🥉', '⭐', '✨',
+      '🔍', '🔎', '📝', '✏️', '📧', '📨', '💬', '💭'
     ];
 
     // Initialisation de Grist
-    grist.ready({
-      requiredAccess: 'full',
-      columns: [{
-        name: 'content',
-        title: 'Content',
-        type: 'Text',
-        optional: true
-      }]
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGrist);
+    } else {
+      initGrist();
+    }
 
-    grist.onOptions(function(options, interaction) {
-      if (interaction) {
-        // Mode configuration
-        document.getElementById('configMode').style.display = 'block';
-        document.getElementById('displayMode').style.display = 'none';
-        
-        // Charger le contenu existant
-        const savedContent = options?.content || '';
-        document.getElementById('editor').innerHTML = savedContent;
-        currentContent = savedContent;
-        
-        initializeEmojiPicker();
-      }
-    });
-
-    grist.onRecords(function(records) {
-      // Mode affichage
-      if (document.getElementById('configMode').style.display === 'none') {
-        const options = grist.widgetApi.getOptions();
-        const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
-        document.getElementById('displayContent').innerHTML = content;
-        
-        // Réinitialiser les sections repliables
-        initCollapsibles();
-      }
-    });
+    function initGrist() {
+      grist.ready({ 
+        requiredAccess: 'read table',
+        onEditOptions: async () => {
+          // Mode configuration
+          configMode.style.display = 'block';
+          displayMode.style.display = 'none';
+          
+          // Charger le contenu existant
+          const options = await grist.getOptions();
+          const savedContent = options?.content || '';
+          const savedFont = options?.font || '';
+          const savedPadding = options?.padding || '';
+          
+          document.getElementById('editor').innerHTML = savedContent;
+          currentContent = savedContent;
+          
+          // Restaurer police et marges
+          if (savedFont) {
+            currentFont = savedFont;
+            applyFont(savedFont);
+          }
+          
+          if (savedPadding) {
+            currentPadding = savedPadding;
+            applyPadding(savedPadding);
+          }
+          
+          initializeEmojiPicker();
+        }
+      });
+      
+      grist.onRecords(async (records) => {
+        // Mode affichage
+        if (configMode.style.display === 'none') {
+          const options = await grist.getOptions();
+          const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
+          const savedFont = options?.font || '';
+          const savedPadding = options?.padding || '';
+          
+          document.getElementById('displayContent').innerHTML = content;
+          
+          // Appliquer police et marges en mode affichage
+          if (savedFont) {
+            document.getElementById('displayContent').style.fontFamily = savedFont;
+          }
+          
+          if (savedPadding) {
+            let padding;
+            switch(savedPadding) {
+              case 'small': padding = '10px'; break;
+              case 'medium': padding = '20px'; break;
+              case 'large': padding = '40px'; break;
+            }
+            if (padding) {
+              document.getElementById('displayContent').style.padding = padding;
+            }
+          }
+          
+          // Réinitialiser les sections repliables
+          initCollapsibles();
+        }
+      });
+    }
 
     // Commandes d'édition
     function execCmd(command, value = null) {
@@ -530,24 +767,71 @@
     }
 
     // Gestion des liens
+    let savedSelection = null;
+    
     function showLinkModal() {
+      // Sauvegarder la sélection actuelle
+      savedSelection = saveSelection();
+      
       document.getElementById('linkModal').classList.add('active');
       document.getElementById('linkText').value = '';
       document.getElementById('linkUrl').value = '';
+      
+      // Pré-remplir avec la sélection si c'est du texte
+      const selection = window.getSelection();
+      if (selection.toString()) {
+        document.getElementById('linkText').value = selection.toString();
+      }
+      
       document.getElementById('linkText').focus();
     }
 
     function closeLinkModal() {
       document.getElementById('linkModal').classList.remove('active');
+      savedSelection = null;
+    }
+
+    function saveSelection() {
+      if (window.getSelection) {
+        const sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          return sel.getRangeAt(0);
+        }
+      }
+      return null;
+    }
+
+    function restoreSelection(range) {
+      if (range) {
+        if (window.getSelection) {
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
     }
 
     function insertLink() {
-      const text = document.getElementById('linkText').value;
-      const url = document.getElementById('linkUrl').value;
+      const text = document.getElementById('linkText').value.trim();
+      let url = document.getElementById('linkUrl').value.trim();
       
       if (text && url) {
-        const link = `<a href="${url}" target="_blank">${text}</a>`;
+        // Ajouter https:// si aucun protocole n'est spécifié
+        if (!url.match(/^https?:\/\//i)) {
+          url = 'https://' + url;
+        }
+        
+        const editor = document.getElementById('editor');
+        editor.focus();
+        
+        // Restaurer la sélection si elle existe
+        if (savedSelection) {
+          restoreSelection(savedSelection);
+        }
+        
+        const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
         document.execCommand('insertHTML', false, link);
+        
         closeLinkModal();
       }
     }
@@ -566,43 +850,225 @@
     function insertImage() {
       let url = document.getElementById('imageUrl').value.trim();
       
-      if (!url) {
-        alert('Veuillez entrer une URL d\'image');
-        return;
-      }
-
-      // Ajouter https:// si pas de protocole
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-
-      // Créer l'élément img
-      const img = document.createElement('img');
-      img.src = url;
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-      img.style.display = 'block';
-      img.style.margin = '16px 0';
-      img.style.borderRadius = '8px';
-      
-      // Insérer l'image dans l'éditeur
-      const editor = document.getElementById('editor');
-      editor.focus();
-      
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(img);
+      if (url) {
+        // Ajouter https:// si aucun protocole n'est spécifié et ce n'est pas du base64
+        if (!url.match(/^(https?:\/\/|data:)/i)) {
+          url = 'https://' + url;
+        }
         
-        // Placer le curseur après l'image
-        range.setStartAfter(img);
-        range.setEndAfter(img);
-        selection.removeAllRanges();
-        selection.addRange(range);
+        const editor = document.getElementById('editor');
+        const existingImage = editor.querySelector('img');
+        
+        if (existingImage) {
+          if (confirm('Une image existe déjà. La remplacer ?')) {
+            existingImage.src = url;
+            existingImage.style.maxWidth = '100%';
+            existingImage.style.height = 'auto';
+            existingImage.style.margin = '16px 0';
+            existingImage.style.borderRadius = '8px';
+            existingImage.style.display = 'block';
+          }
+        } else {
+          editor.focus();
+          // Créer un élément img directement plutôt que via insertHTML
+          const imgElement = document.createElement('img');
+          imgElement.src = url;
+          imgElement.style.maxWidth = '100%';
+          imgElement.style.height = 'auto';
+          imgElement.style.margin = '16px 0';
+          imgElement.style.borderRadius = '8px';
+          imgElement.style.display = 'block';
+          imgElement.alt = 'Image';
+          
+          // Insérer l'élément
+          const selection = window.getSelection();
+          if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.insertNode(imgElement);
+            range.collapse(false);
+          } else {
+            editor.appendChild(imgElement);
+          }
+        }
+        
+        closeImageModal();
+      }
+    }
+
+    // Gestion des tableaux
+    function showTableModal() {
+      document.getElementById('tableModal').classList.add('active');
+      document.getElementById('tableRows').value = 3;
+      document.getElementById('tableCols').value = 3;
+      document.getElementById('tableRows').focus();
+    }
+
+    function closeTableModal() {
+      document.getElementById('tableModal').classList.remove('active');
+    }
+
+    function insertTable() {
+      const rows = parseInt(document.getElementById('tableRows').value);
+      const cols = parseInt(document.getElementById('tableCols').value);
+      
+      if (rows > 0 && cols > 0 && rows <= 20 && cols <= 10) {
+        let tableHTML = '<table><thead><tr>';
+        
+        // En-têtes
+        for (let i = 0; i < cols; i++) {
+          tableHTML += '<th>Colonne ' + (i + 1) + '</th>';
+        }
+        tableHTML += '</tr></thead><tbody>';
+        
+        // Corps
+        for (let i = 0; i < rows; i++) {
+          tableHTML += '<tr>';
+          for (let j = 0; j < cols; j++) {
+            tableHTML += '<td><br></td>';
+          }
+          tableHTML += '</tr>';
+        }
+        tableHTML += '</tbody></table><p><br></p>';
+        
+        document.getElementById('editor').focus();
+        document.execCommand('insertHTML', false, tableHTML);
+        
+        closeTableModal();
+      }
+    }
+
+    // Gestion du color dropdown
+    function toggleColorDropdown() {
+      const dropdown = document.getElementById('colorDropdown');
+      const bgDropdown = document.getElementById('bgColorDropdown');
+      bgDropdown.classList.remove('active');
+      dropdown.classList.toggle('active');
+    }
+
+    function applyColor(color) {
+      document.getElementById('editor').focus();
+      document.execCommand('foreColor', false, color);
+      document.getElementById('currentColorIcon').style.color = color;
+      document.getElementById('colorDropdown').classList.remove('active');
+    }
+
+    function applyCustomColor() {
+      const input = document.getElementById('customColorInput');
+      const color = input.value.trim();
+      
+      if (color) {
+        applyColor(color);
+        input.value = '';
+      }
+    }
+
+    // Gestion du background color dropdown
+    function toggleBgColorDropdown() {
+      const dropdown = document.getElementById('bgColorDropdown');
+      const colorDropdown = document.getElementById('colorDropdown');
+      colorDropdown.classList.remove('active');
+      dropdown.classList.toggle('active');
+    }
+
+    function applyBgColor(color) {
+      document.getElementById('editor').focus();
+      document.execCommand('backColor', false, color);
+      document.getElementById('currentBgColorIcon').style.background = color;
+      document.getElementById('bgColorDropdown').classList.remove('active');
+    }
+
+    function applyCustomBgColor() {
+      const input = document.getElementById('customBgColorInput');
+      let color = input.value.trim();
+      
+      if (color) {
+        // Convertir hex en rgba si nécessaire
+        if (color.match(/^#[0-9A-F]{6}$/i)) {
+          const r = parseInt(color.slice(1, 3), 16);
+          const g = parseInt(color.slice(3, 5), 16);
+          const b = parseInt(color.slice(5, 7), 16);
+          color = `rgba(${r}, ${g}, ${b}, 0.2)`;
+        }
+        applyBgColor(color);
+        input.value = '';
+      }
+    }
+
+    // Fermer les dropdowns si on clique ailleurs
+    document.addEventListener('click', function(e) {
+      const colorDropdown = document.getElementById('colorDropdown');
+      const bgColorDropdown = document.getElementById('bgColorDropdown');
+      const colorBtn = e.target.closest('[onclick*="toggleColorDropdown"]');
+      const bgColorBtn = e.target.closest('[onclick*="toggleBgColorDropdown"]');
+      
+      if (colorDropdown && !colorDropdown.contains(e.target) && !colorBtn) {
+        colorDropdown.classList.remove('active');
       }
       
-      closeImageModal();
+      if (bgColorDropdown && !bgColorDropdown.contains(e.target) && !bgColorBtn) {
+        bgColorDropdown.classList.remove('active');
+      }
+    });
+
+    // Gestion de la police (applique à tout le texte)
+    let currentFont = '';
+    
+    function applyFont(font) {
+      if (!font) return;
+      
+      const editor = document.getElementById('editor');
+      const displayContent = document.getElementById('displayContent');
+      
+      // Appliquer la police directement au conteneur
+      editor.style.fontFamily = font;
+      displayContent.style.fontFamily = font;
+      
+      // Pour appliquer aussi au contenu existant, on wrapp tout dans un span
+      // mais seulement si c'est lors de l'édition
+      if (editor.innerHTML && editor.style.display !== 'none') {
+        // Nettoyer les anciens spans de police
+        const content = editor.innerHTML;
+        editor.innerHTML = content;
+      }
+      
+      currentFont = font;
+      
+      // Mettre à jour le select
+      const fontSelect = document.getElementById('fontSelect');
+      if (fontSelect) {
+        fontSelect.value = font;
+      }
+    }
+
+    // Gestion des marges
+    let currentPadding = '';
+    
+    function applyPadding(size) {
+      if (!size) return;
+      
+      const editor = document.getElementById('editor');
+      const displayContent = document.getElementById('displayContent');
+      
+      let padding;
+      switch(size) {
+        case 'small':
+          padding = '10px';
+          break;
+        case 'medium':
+          padding = '20px';
+          break;
+        case 'large':
+          padding = '40px';
+          break;
+        default:
+          return;
+      }
+      
+      editor.style.padding = padding;
+      displayContent.style.padding = padding;
+      
+      currentPadding = size;
+      document.getElementById('paddingSelect').value = size;
     }
 
     // Gestion des emojis
@@ -619,9 +1085,20 @@
       });
     }
 
-    function toggleEmojiPicker() {
+    function toggleEmojiPicker(event) {
       const picker = document.getElementById('emojiPicker');
-      picker.classList.toggle('active');
+      
+      if (picker.classList.contains('active')) {
+        picker.classList.remove('active');
+      } else {
+        const btn = event.target.closest('.toolbar-btn');
+        const rect = btn.getBoundingClientRect();
+        
+        picker.style.top = (rect.bottom + 4) + 'px';
+        picker.style.left = rect.left + 'px';
+        
+        picker.classList.add('active');
+      }
     }
 
     function insertEmoji(emoji) {
@@ -677,7 +1154,9 @@
       const content = document.getElementById('editor').innerHTML;
       
       await grist.setOptions({
-        content: content
+        content: content,
+        font: currentFont,
+        padding: currentPadding
       });
       
       // Retour au mode affichage
@@ -685,9 +1164,24 @@
       document.getElementById('displayMode').style.display = 'block';
       document.getElementById('displayContent').innerHTML = content;
       
-      initCollapsibles();
+      // Appliquer police et marges en mode affichage
+      if (currentFont) {
+        document.getElementById('displayContent').style.fontFamily = currentFont;
+      }
       
-      grist.widgetApi.closeOptions();
+      if (currentPadding) {
+        let padding;
+        switch(currentPadding) {
+          case 'small': padding = '10px'; break;
+          case 'medium': padding = '20px'; break;
+          case 'large': padding = '40px'; break;
+        }
+        if (padding) {
+          document.getElementById('displayContent').style.padding = padding;
+        }
+      }
+      
+      initCollapsibles();
     }
 
     function cancelEdit() {
@@ -697,8 +1191,6 @@
       // Retour au mode affichage
       document.getElementById('configMode').style.display = 'none';
       document.getElementById('displayMode').style.display = 'block';
-      
-      grist.widgetApi.closeOptions();
     }
 
     // Raccourcis clavier
