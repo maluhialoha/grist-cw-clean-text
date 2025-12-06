@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grist Text Editor Widget</title>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border: #e5e7eb;
+      --bg: #ffffff;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --hover: #f3f4f6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Mode Configuration */
+    .config-mode {
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .config-header {
+      margin-bottom: 24px;
+    }
+
+    .config-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .config-header p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: var(--hover);
+      border: 1px solid var(--border);
+      border-radius: 8px 8px 0 0;
+      border-bottom: none;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 4px;
+      padding-right: 8px;
+      border-right: 1px solid var(--border);
+    }
+
+    .toolbar-group:last-child {
+      border-right: none;
+    }
+
+    .toolbar-btn {
+      padding: 6px 10px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .toolbar-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .toolbar-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    select.toolbar-btn {
+      padding: 6px 8px;
+      cursor: pointer;
+    }
+
+    input[type="color"] {
+      width: 40px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Editor */
+    .editor-container {
+      border: 1px solid var(--border);
+      border-radius: 0 0 8px 8px;
+      background: white;
+      min-height: 400px;
+    }
+
+    #editor {
+      padding: 20px;
+      min-height: 400px;
+      outline: none;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    #editor:empty:before {
+      content: attr(data-placeholder);
+      color: var(--text-light);
+    }
+
+    /* Styles de texte dans l'éditeur */
+    #editor h1 {
+      font-size: 2em;
+      font-weight: 700;
+      margin: 16px 0;
+    }
+
+    #editor h2 {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin: 14px 0;
+    }
+
+    #editor h3 {
+      font-size: 1.25em;
+      font-weight: 600;
+      margin: 12px 0;
+    }
+
+    #editor p {
+      margin: 8px 0;
+    }
+
+    #editor ul {
+      margin: 8px 0;
+      padding-left: 24px;
+    }
+
+    #editor li {
+      margin: 4px 0;
+    }
+
+    #editor a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    /* Section repliable */
+    .collapsible-section {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+
+    .collapsible-header {
+      background: var(--hover);
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .collapsible-header:hover {
+      background: #e5e7eb;
+    }
+
+    .collapsible-arrow {
+      transition: transform 0.3s;
+      font-size: 12px;
+    }
+
+    .collapsible-section.collapsed .collapsible-arrow {
+      transform: rotate(-90deg);
+    }
+
+    .collapsible-content {
+      padding: 16px;
+      display: block;
+    }
+
+    .collapsible-section.collapsed .collapsible-content {
+      display: none;
+    }
+
+    /* Actions */
+    .config-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--hover);
+    }
+
+    /* Mode Display */
+    .display-mode {
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .display-content {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* Modal pour les liens */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-content h3 {
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* Emoji Picker Simple */
+    .emoji-picker {
+      display: none;
+      position: absolute;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      max-width: 300px;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+    }
+
+    .emoji-picker.active {
+      display: grid;
+    }
+
+    .emoji-btn {
+      padding: 8px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .emoji-btn:hover {
+      background: var(--hover);
+    }
+  </style>
+</head>
+<body>
+  <!-- Mode Configuration -->
+  <div id="configMode" class="config-mode" style="display: none;">
+    <div class="config-header">
+      <h1>📝 Éditeur de texte riche</h1>
+      <p>Créez et formatez votre contenu</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="execCmd('bold')" title="Gras (Ctrl+B)">
+          <strong>B</strong>
+        </button>
+        <button class="toolbar-btn" onclick="execCmd('italic')" title="Italique (Ctrl+I)">
+          <em>I</em>
+        </button>
+        <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)">
+          <u>U</u>
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <select class="toolbar-btn" onchange="execCmd('formatBlock', this.value); this.selectedIndex=0;">
+          <option value="">Style</option>
+          <option value="h1">Titre 1</option>
+          <option value="h2">Titre 2</option>
+          <option value="h3">Titre 3</option>
+          <option value="p">Paragraphe</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <select class="toolbar-btn" onchange="execCmd('fontName', this.value); this.selectedIndex=0;">
+          <option value="">Police</option>
+          <option value="Roboto">Roboto</option>
+          <option value="Helvetica">Helvetica</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Arial">Arial</option>
+          <option value="Marianne">Marianne</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <input type="color" id="colorPicker" onchange="execCmd('foreColor', this.value)" title="Couleur du texte">
+      </div>
+
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
+          • Liste
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
+          🔗 Lien
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="toggleEmojiPicker()" title="Insérer un emoji">
+          😀 Emoji
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
+          ▼ Section
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div id="editor" contenteditable="true" data-placeholder="Commencez à écrire..."></div>
+    </div>
+
+    <!-- Emoji Picker -->
+    <div id="emojiPicker" class="emoji-picker"></div>
+
+    <div class="config-actions">
+      <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
+      <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Mode Display -->
+  <div id="displayMode" class="display-mode">
+    <div id="displayContent" class="display-content"></div>
+  </div>
+
+  <!-- Modal pour les liens -->
+  <div id="linkModal" class="modal">
+    <div class="modal-content">
+      <h3>Ajouter un lien</h3>
+      <input type="text" id="linkText" placeholder="Texte du lien">
+      <input type="url" id="linkUrl" placeholder="https://exemple.com">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeLinkModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertLink()">Insérer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let grist;
+    let currentContent = '';
+    
+    // Emojis populaires
+    const emojis = [
+      '😀', '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
+      '😂', '🤣', '😅', '😆', '😉', '😌', '😔', '😢',
+      '👍', '👎', '👏', '🙌', '👋', '🤝', '💪', '🙏',
+      '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍',
+      '⭐', '✨', '💫', '🔥', '💥', '✅', '❌', '⚠️',
+      '📝', '📌', '📍', '🔔', '💡', '🎯', '🎉', '🎊'
+    ];
+
+    // Initialisation de Grist
+    grist.ready({
+      requiredAccess: 'full',
+      columns: [{
+        name: 'content',
+        title: 'Content',
+        type: 'Text',
+        optional: true
+      }]
+    });
+
+    grist.onOptions(function(options, interaction) {
+      if (interaction) {
+        // Mode configuration
+        document.getElementById('configMode').style.display = 'block';
+        document.getElementById('displayMode').style.display = 'none';
+        
+        // Charger le contenu existant
+        const savedContent = options?.content || '';
+        document.getElementById('editor').innerHTML = savedContent;
+        currentContent = savedContent;
+        
+        initializeEmojiPicker();
+      }
+    });
+
+    grist.onRecords(function(records) {
+      // Mode affichage
+      if (document.getElementById('configMode').style.display === 'none') {
+        const options = grist.widgetApi.getOptions();
+        const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
+        document.getElementById('displayContent').innerHTML = content;
+        
+        // Réinitialiser les sections repliables
+        initCollapsibles();
+      }
+    });
+
+    // Commandes d'édition
+    function execCmd(command, value = null) {
+      document.getElementById('editor').focus();
+      document.execCommand(command, false, value);
+    }
+
+    // Gestion des liens
+    function showLinkModal() {
+      document.getElementById('linkModal').classList.add('active');
+      document.getElementById('linkText').value = '';
+      document.getElementById('linkUrl').value = '';
+      document.getElementById('linkText').focus();
+    }
+
+    function closeLinkModal() {
+      document.getElementById('linkModal').classList.remove('active');
+    }
+
+    function insertLink() {
+      const text = document.getElementById('linkText').value;
+      const url = document.getElementById('linkUrl').value;
+      
+      if (text && url) {
+        const link = `<a href="${url}" target="_blank">${text}</a>`;
+        document.execCommand('insertHTML', false, link);
+        closeLinkModal();
+      }
+    }
+
+    // Gestion des emojis
+    function initializeEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.innerHTML = '';
+      
+      emojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'emoji-btn';
+        btn.textContent = emoji;
+        btn.onclick = () => insertEmoji(emoji);
+        picker.appendChild(btn);
+      });
+    }
+
+    function toggleEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.classList.toggle('active');
+    }
+
+    function insertEmoji(emoji) {
+      document.execCommand('insertText', false, emoji);
+      document.getElementById('emojiPicker').classList.remove('active');
+      document.getElementById('editor').focus();
+    }
+
+    // Fermer l'emoji picker si on clique ailleurs
+    document.addEventListener('click', function(e) {
+      const picker = document.getElementById('emojiPicker');
+      const emojiBtn = event.target.closest('[onclick*="toggleEmojiPicker"]');
+      
+      if (!picker.contains(e.target) && !emojiBtn) {
+        picker.classList.remove('active');
+      }
+    });
+
+    // Section repliable
+    function insertCollapsible() {
+      const sectionHTML = `
+        <div class="collapsible-section" contenteditable="false">
+          <div class="collapsible-header" onclick="toggleCollapsible(this)">
+            <span contenteditable="true">Titre de la section</span>
+            <span class="collapsible-arrow">▼</span>
+          </div>
+          <div class="collapsible-content" contenteditable="true">
+            <p>Contenu de la section...</p>
+          </div>
+        </div>
+        <p><br></p>
+      `;
+      
+      document.execCommand('insertHTML', false, sectionHTML);
+    }
+
+    function toggleCollapsible(header) {
+      const section = header.parentElement;
+      section.classList.toggle('collapsed');
+    }
+
+    function initCollapsibles() {
+      const headers = document.querySelectorAll('.collapsible-header');
+      headers.forEach(header => {
+        header.onclick = function() {
+          toggleCollapsible(this);
+        };
+      });
+    }
+
+    // Sauvegarde
+    async function saveContent() {
+      const content = document.getElementById('editor').innerHTML;
+      
+      await grist.setOptions({
+        content: content
+      });
+      
+      // Retour au mode affichage
+      document.getElementById('configMode').style.display = 'none';
+      document.getElementById('displayMode').style.display = 'block';
+      document.getElementById('displayContent').innerHTML = content;
+      
+      initCollapsibles();
+      
+      grist.widgetApi.closeOptions();
+    }
+
+    function cancelEdit() {
+      // Restaurer le contenu original
+      document.getElementById('editor').innerHTML = currentContent;
+      
+      // Retour au mode affichage
+      document.getElementById('configMode').style.display = 'none';
+      document.getElementById('displayMode').style.display = 'block';
+      
+      grist.widgetApi.closeOptions();
+    }
+
+    // Raccourcis clavier
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey || e.metaKey) {
+        switch(e.key.toLowerCase()) {
+          case 'b':
+            e.preventDefault();
+            execCmd('bold');
+            break;
+          case 'i':
+            e.preventDefault();
+            execCmd('italic');
+            break;
+          case 'u':
+            e.preventDefault();
+            execCmd('underline');
+            break;
+        }
+      }
+    });
+
+    // Initialisation au chargement
+    window.addEventListener('load', function() {
+      initializeEmojiPicker();
+    });
+  </script>
+</body>
+</html>
