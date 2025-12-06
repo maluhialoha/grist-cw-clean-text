@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grist Text Editor Widget</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -36,7 +37,10 @@
     }
 
     .config-header {
-      margin-bottom: 24px;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+      gap: 12px;
     }
 
     .config-header h1 {
@@ -48,6 +52,11 @@
     .config-header p {
       color: var(--text-light);
       font-size: 14px;
+    }
+
+    .config-actions {
+      display: flex;
+      gap: 12px;
     }
 
     /* Toolbar */
@@ -112,6 +121,80 @@
       cursor: pointer;
     }
 
+    /* Color Dropdown */
+    .color-dropdown-wrapper {
+      position: relative;
+    }
+
+    .color-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      min-width: 200px;
+      margin-top: 4px;
+    }
+
+    .color-dropdown.active {
+      display: block;
+    }
+
+    .color-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .color-preset {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .color-preset:hover {
+      transform: scale(1.1);
+      border-color: var(--primary);
+    }
+
+    .color-custom {
+      display: flex;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .color-custom input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .color-custom button {
+      padding: 6px 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .color-custom button:hover {
+      background: var(--primary-hover);
+    }
+
     /* Editor */
     .editor-container {
       border: 1px solid var(--border);
@@ -158,10 +241,19 @@
 
     #editor ul {
       margin: 8px 0;
-      padding-left: 24px;
+      padding-left: 40px;
     }
 
     #editor li {
+      margin: 4px 0;
+    }
+
+    .display-content ul {
+      margin: 8px 0;
+      padding-left: 40px;
+    }
+
+    .display-content li {
       margin: 4px 0;
     }
 
@@ -347,8 +439,10 @@
   <!-- Mode Configuration -->
   <div id="configMode" class="config-mode" style="display: none;">
     <div class="config-header">
-      <h1>📝 Éditeur de texte riche</h1>
-      <p>Créez et formatez votre contenu</p>
+      <div class="config-actions">
+        <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
+        <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
+      </div>
     </div>
 
     <div class="toolbar">
@@ -361,6 +455,9 @@
         </button>
         <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)">
           <u>U</u>
+        </button>
+        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
+          🔗
         </button>
       </div>
 
@@ -381,23 +478,41 @@
           <option value="Helvetica">Helvetica</option>
           <option value="Verdana">Verdana</option>
           <option value="Arial">Arial</option>
-          <option value="Marianne">Marianne</option>
+          <option value="'Marianne', sans-serif">Marianne</option>
         </select>
       </div>
 
       <div class="toolbar-group">
-        <input type="color" id="colorPicker" onchange="execCmd('foreColor', this.value)" title="Couleur du texte">
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
+            <span style="color: #000000;" id="currentColorIcon">A</span>
+          </button>
+          <div id="colorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: #000000;" onclick="applyColor('#000000')" title="Noir"></button>
+              <button class="color-preset" style="background: #6B7280;" onclick="applyColor('#6B7280')" title="Gris"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="applyColor('#EF4444')" title="Rouge"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="applyColor('#F97316')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyColor('#F59E0B')" title="Jaune"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="applyColor('#10B981')" title="Vert"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="applyColor('#3B82F6')" title="Bleu"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="applyColor('#8B5CF6')" title="Violet"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="applyColor('#EC4899')" title="Rose"></button>
+            </div>
+            <div class="color-custom">
+              <input type="text" id="customColorInput" placeholder="#HEX ou nom" />
+              <button onclick="applyCustomColor()">OK</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="toolbar-group">
         <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
-          • Liste
+          • Puce
         </button>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
-          🔗 Lien
+        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
+          ▼ Section
         </button>
       </div>
 
@@ -408,9 +523,18 @@
       </div>
 
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
-          ▼ Section
+        <button class="toolbar-btn" onclick="showImageModal()" title="Ajouter une image">
+          🖼️ Image
         </button>
+      </div>
+
+      <div class="toolbar-group">
+        <select class="toolbar-btn" onchange="applyPadding(this.value); this.selectedIndex=0;" title="Marges">
+          <option value="">Marges</option>
+          <option value="small">Petites</option>
+          <option value="medium">Moyennes</option>
+          <option value="large">Grandes</option>
+        </select>
       </div>
     </div>
 
@@ -420,11 +544,6 @@
 
     <!-- Emoji Picker -->
     <div id="emojiPicker" class="emoji-picker"></div>
-
-    <div class="config-actions">
-      <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
-      <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
-    </div>
   </div>
 
   <!-- Mode Display -->
@@ -445,19 +564,34 @@
     </div>
   </div>
 
+  <!-- Modal pour les images -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <h3>Ajouter une image</h3>
+      <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">
+        URL de l'image ou encodage base64
+      </p>
+      <input type="text" id="imageUrl" placeholder="https://exemple.com/image.jpg ou data:image/...">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeImageModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertImage()">Insérer</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let currentContent = '';
     const configMode = document.getElementById('configMode');
     const displayMode = document.getElementById('displayMode');
     
-    // Emojis populaires
+    // Emojis professionnels
     const emojis = [
-      '😀', '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
-      '😂', '🤣', '😅', '😆', '😉', '😌', '😔', '😢',
-      '👍', '👎', '👏', '🙌', '👋', '🤝', '💪', '🙏',
-      '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍',
-      '⭐', '✨', '💫', '🔥', '💥', '✅', '❌', '⚠️',
-      '📝', '📌', '📍', '🔔', '💡', '🎯', '🎉', '🎊'
+      '📊', '📈', '📉', '💼', '🏢', '🏭', '🏗️', '⚙️',
+      '🔧', '🔨', '🛠️', '📋', '📌', '📍', '📎', '✂️',
+      '📁', '📂', '🗂️', '📅', '📆', '🗓️', '⏰', '⏱️',
+      '✅', '❌', '⚠️', '⛔', '🚫', '💡', '🔔', '📢',
+      '🎯', '🎓', '🏆', '🥇', '🥈', '🥉', '⭐', '✨',
+      '🔍', '🔎', '📝', '✏️', '📧', '📨', '💬', '💭'
     ];
 
     // Initialisation de Grist
@@ -509,6 +643,13 @@
       document.getElementById('linkModal').classList.add('active');
       document.getElementById('linkText').value = '';
       document.getElementById('linkUrl').value = '';
+      
+      // Pré-remplir avec la sélection si c'est du texte
+      const selection = window.getSelection();
+      if (selection.toString()) {
+        document.getElementById('linkText').value = selection.toString();
+      }
+      
       document.getElementById('linkText').focus();
     }
 
@@ -524,7 +665,98 @@
         const link = `<a href="${url}" target="_blank">${text}</a>`;
         document.execCommand('insertHTML', false, link);
         closeLinkModal();
+        document.getElementById('editor').focus();
       }
+    }
+
+    // Gestion des images
+    function showImageModal() {
+      document.getElementById('imageModal').classList.add('active');
+      document.getElementById('imageUrl').value = '';
+      document.getElementById('imageUrl').focus();
+    }
+
+    function closeImageModal() {
+      document.getElementById('imageModal').classList.remove('active');
+    }
+
+    function insertImage() {
+      const url = document.getElementById('imageUrl').value.trim();
+      
+      if (url) {
+        // Vérifier si une image existe déjà
+        const editor = document.getElementById('editor');
+        const existingImage = editor.querySelector('img');
+        
+        if (existingImage) {
+          if (confirm('Une image existe déjà. La remplacer ?')) {
+            existingImage.src = url;
+          }
+        } else {
+          const img = `<img src="${url}" style="max-width: 100%; height: auto; margin: 16px 0; border-radius: 8px;" />`;
+          document.execCommand('insertHTML', false, img);
+        }
+        
+        closeImageModal();
+        document.getElementById('editor').focus();
+      }
+    }
+
+    // Gestion du color dropdown
+    function toggleColorDropdown() {
+      const dropdown = document.getElementById('colorDropdown');
+      dropdown.classList.toggle('active');
+    }
+
+    function applyColor(color) {
+      document.getElementById('editor').focus();
+      document.execCommand('foreColor', false, color);
+      document.getElementById('currentColorIcon').style.color = color;
+      document.getElementById('colorDropdown').classList.remove('active');
+    }
+
+    function applyCustomColor() {
+      const input = document.getElementById('customColorInput');
+      const color = input.value.trim();
+      
+      if (color) {
+        applyColor(color);
+        input.value = '';
+      }
+    }
+
+    // Fermer le color dropdown si on clique ailleurs
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('colorDropdown');
+      const colorBtn = e.target.closest('[onclick*="toggleColorDropdown"]');
+      
+      if (dropdown && !dropdown.contains(e.target) && !colorBtn) {
+        dropdown.classList.remove('active');
+      }
+    });
+
+    // Gestion des marges
+    function applyPadding(size) {
+      const editor = document.getElementById('editor');
+      const displayContent = document.getElementById('displayContent');
+      
+      let padding;
+      switch(size) {
+        case 'small':
+          padding = '10px';
+          break;
+        case 'medium':
+          padding = '20px';
+          break;
+        case 'large':
+          padding = '40px';
+          break;
+        default:
+          return;
+      }
+      
+      editor.style.padding = padding;
+      displayContent.style.padding = padding;
     }
 
     // Gestion des emojis
