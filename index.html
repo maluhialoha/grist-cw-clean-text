@@ -139,10 +139,12 @@
       font-size: 14px;
       color: var(--text);
       transition: all 0.2s;
-      display: flex;
+      display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
       min-height: 32px;
+      vertical-align: middle;
     }
 
     .toolbar-btn:hover {
@@ -493,9 +495,12 @@
       padding: 12px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       z-index: 100;
-      max-width: 300px;
+      width: 320px;
+      max-height: 300px;
+      overflow-y: auto;
       grid-template-columns: repeat(8, 1fr);
       gap: 4px;
+      right: 0;
     }
 
     .emoji-picker.active {
@@ -573,7 +578,7 @@
       <div class="toolbar-group">
         <div class="color-dropdown-wrapper">
           <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
-            <span style="color: #000000; font-weight: bold; font-size: 18px; line-height: 1;" id="currentColorIcon">A</span>
+            <span style="color: #000000; font-weight: bold; font-size: 16px; display: inline-block; line-height: 1;" id="currentColorIcon">A</span>
           </button>
           <div id="colorDropdown" class="color-dropdown">
             <div class="color-presets">
@@ -608,31 +613,31 @@
 
         <div class="color-dropdown-wrapper">
           <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de fond du texte">
-            <span style="background: rgba(255, 255, 0, 0.3); padding: 2px 6px; font-weight: bold; font-size: 18px; line-height: 1;" id="currentBgColorIcon">A</span>
+            <span style="background: rgba(255, 255, 0, 0.3); padding: 2px 6px; font-weight: bold; font-size: 16px; display: inline-block; line-height: 1;" id="currentBgColorIcon">A</span>
           </button>
           <div id="bgColorDropdown" class="color-dropdown">
             <div class="color-presets">
-              <button class="color-preset" style="background: rgba(0, 0, 0, 0.1);" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
-              <button class="color-preset" style="background: rgba(55, 65, 81, 0.15);" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
-              <button class="color-preset" style="background: rgba(107, 114, 128, 0.15);" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
-              <button class="color-preset" style="background: rgba(156, 163, 175, 0.2);" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
-              <button class="color-preset" style="background: rgba(220, 38, 38, 0.2);" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
-              <button class="color-preset" style="background: rgba(239, 68, 68, 0.2);" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
-              <button class="color-preset" style="background: rgba(234, 88, 12, 0.2);" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
-              <button class="color-preset" style="background: rgba(249, 115, 22, 0.2);" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
-              <button class="color-preset" style="background: rgba(245, 158, 11, 0.2);" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
-              <button class="color-preset" style="background: rgba(251, 191, 36, 0.3);" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
-              <button class="color-preset" style="background: rgba(132, 204, 22, 0.2);" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
-              <button class="color-preset" style="background: rgba(16, 185, 129, 0.2);" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
-              <button class="color-preset" style="background: rgba(20, 184, 166, 0.2);" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
-              <button class="color-preset" style="background: rgba(6, 182, 212, 0.2);" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
-              <button class="color-preset" style="background: rgba(14, 165, 233, 0.2);" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
-              <button class="color-preset" style="background: rgba(59, 130, 246, 0.2);" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
-              <button class="color-preset" style="background: rgba(99, 102, 241, 0.2);" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
-              <button class="color-preset" style="background: rgba(139, 92, 246, 0.2);" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
-              <button class="color-preset" style="background: rgba(168, 85, 247, 0.2);" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
-              <button class="color-preset" style="background: rgba(217, 70, 239, 0.2);" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
-              <button class="color-preset" style="background: rgba(236, 72, 153, 0.2);" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
+              <button class="color-preset" style="background: #E5E5E5;" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
+              <button class="color-preset" style="background: #D1D5DB;" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #D1D5DB;" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
+              <button class="color-preset" style="background: #E5E7EB;" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
+              <button class="color-preset" style="background: #FEE2E2;" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #FECACA;" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #FFEDD5;" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #FED7AA;" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
+              <button class="color-preset" style="background: #FDE68A;" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FEF3C7;" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #ECFCCB;" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
+              <button class="color-preset" style="background: #D1FAE5;" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
+              <button class="color-preset" style="background: #CCFBF1;" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
+              <button class="color-preset" style="background: #CFFAFE;" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #DBEAFE;" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #DBEAFE;" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #E0E7FF;" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #EDE9FE;" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
+              <button class="color-preset" style="background: #F3E8FF;" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #FAE8FF;" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #FCE7F3;" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
             </div>
             <div class="color-custom">
               <input type="text" id="customBgColorInput" placeholder="#HEX" />
@@ -645,12 +650,6 @@
       <div class="toolbar-group">
         <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
           😀
-        </button>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="showImageModal()" title="Ajouter une image">
-          🖼️
         </button>
       </div>
 
@@ -712,13 +711,19 @@
     
     // Emojis professionnels
     const emojis = [
+      '😀', '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
+      '😂', '🤣', '😉', '😎', '🤔', '😐', '😑', '😶',
+      '🙄', '😮', '😯', '😲', '😳', '🥺', '😢', '😭',
+      '😤', '😠', '😡', '🤬', '😱', '😨', '😰', '😥',
+      '🤝', '👍', '👎', '👏', '🙏', '💪', '✊', '👊',
+      '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '💔',
       '📊', '📈', '📉', '💼', '🏢', '🏭', '🏗️', '⚙️',
       '🔧', '🔨', '🛠️', '📋', '📌', '📍', '📎', '✂️',
       '📁', '📂', '🗂️', '📅', '📆', '🗓️', '⏰', '⏱️',
       '✅', '❌', '⚠️', '⛔', '🚫', '💡', '🔔', '📢',
       '🎯', '🎓', '🏆', '🥇', '🥈', '🥉', '⭐', '✨',
       '🔍', '🔎', '📝', '✏️', '📧', '📨', '💬', '💭'
-    ];
+    ]
 
     // Initialisation de Grist
     if (document.readyState === 'loading') {
@@ -865,63 +870,6 @@
         document.execCommand('insertHTML', false, link);
         
         closeLinkModal();
-      }
-    }
-
-    // Gestion des images
-    function showImageModal() {
-      document.getElementById('imageModal').classList.add('active');
-      document.getElementById('imageUrl').value = '';
-      document.getElementById('imageUrl').focus();
-    }
-
-    function closeImageModal() {
-      document.getElementById('imageModal').classList.remove('active');
-    }
-
-    function insertImage() {
-      let url = document.getElementById('imageUrl').value.trim();
-      
-      if (url) {
-        // Ajouter https:// si aucun protocole n'est spécifié et ce n'est pas du base64
-        if (!url.match(/^(https?:\/\/|data:)/i)) {
-          url = 'https://' + url;
-        }
-        
-        const editor = document.getElementById('editor');
-        editor.focus();
-        
-        // Créer un élément img
-        const imgElement = document.createElement('img');
-        imgElement.src = url;
-        imgElement.style.maxWidth = '100%';
-        imgElement.style.height = 'auto';
-        imgElement.style.margin = '16px 0';
-        imgElement.style.borderRadius = '8px';
-        imgElement.style.display = 'block';
-        imgElement.alt = 'Image';
-        
-        // Insérer l'élément
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          range.deleteContents();
-          range.insertNode(imgElement);
-          
-          // Ajouter un paragraphe vide après l'image pour continuer l'édition
-          const br = document.createElement('br');
-          range.collapse(false);
-          range.insertNode(br);
-          range.setStartAfter(br);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        } else {
-          editor.appendChild(imgElement);
-          editor.appendChild(document.createElement('br'));
-        }
-        
-        closeImageModal();
       }
     }
 
@@ -1083,7 +1031,8 @@
         const rect = btn.getBoundingClientRect();
         
         picker.style.top = (rect.bottom + 4) + 'px';
-        picker.style.left = rect.left + 'px';
+        picker.style.right = '12px';
+        picker.style.left = 'auto';
         
         picker.classList.add('active');
       }
@@ -1107,7 +1056,7 @@
 
     // Section repliable
     function insertCollapsible() {
-      const sectionHTML = `
+      const sectionHTML = `<p><br></p>
         <div class="collapsible-section" contenteditable="false">
           <div class="collapsible-header" onclick="toggleCollapsible(this)">
             <span contenteditable="true">Titre de la section</span>
@@ -1117,10 +1066,22 @@
             <p>Contenu de la section...</p>
           </div>
         </div>
-        <p><br></p>
-      `;
+        <p><br></p>`;
       
       document.execCommand('insertHTML', false, sectionHTML);
+      
+      // Placer le curseur après la section
+      const editor = document.getElementById('editor');
+      const sections = editor.querySelectorAll('.collapsible-section');
+      const lastSection = sections[sections.length - 1];
+      if (lastSection && lastSection.nextElementSibling) {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.setStart(lastSection.nextElementSibling, 0);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
     }
 
     function toggleCollapsible(header) {
