@@ -172,6 +172,14 @@
       text-decoration: underline;
     }
 
+    #editor img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+
     /* Section repliable */
     .collapsible-section {
       border: 1px solid var(--border);
@@ -402,6 +410,9 @@
         <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
           🔗 Lien
         </button>
+        <button class="toolbar-btn" onclick="showImageModal()" title="Ajouter une image">
+          🖼️ Image
+        </button>
       </div>
 
       <div class="toolbar-group">
@@ -448,17 +459,28 @@
     </div>
   </div>
 
+  <!-- Modal pour les images -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <h3>Ajouter une image</h3>
+      <input type="url" id="imageUrl" placeholder="URL de l'image (https://...)">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeImageModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertImage()">Insérer</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let grist;
     let currentContent = '';
     
-    // Emojis populaires
+    // Emojis populaires - ajout des emojis sociaux en début
     const emojis = [
       '😀', '👍', '👎', '🤝', '👏', '🙏', '💪', '✌️',
-      '😀', '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
+      '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
       '😂', '🤣', '😅', '😆', '😉', '😌', '😔', '😢',
-      '👍', '👎', '👏', '🙌', '👋', '🤝', '💪', '🙏',
-      '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍',
+      '👋', '🙌', '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍',
       '⭐', '✨', '💫', '🔥', '💥', '✅', '❌', '⚠️',
       '📝', '📌', '📍', '🔔', '💡', '🎯', '🎉', '🎊'
     ];
@@ -528,6 +550,59 @@
         document.execCommand('insertHTML', false, link);
         closeLinkModal();
       }
+    }
+
+    // Gestion des images
+    function showImageModal() {
+      document.getElementById('imageModal').classList.add('active');
+      document.getElementById('imageUrl').value = '';
+      document.getElementById('imageUrl').focus();
+    }
+
+    function closeImageModal() {
+      document.getElementById('imageModal').classList.remove('active');
+    }
+
+    function insertImage() {
+      let url = document.getElementById('imageUrl').value.trim();
+      
+      if (!url) {
+        alert('Veuillez entrer une URL d\'image');
+        return;
+      }
+
+      // Ajouter https:// si pas de protocole
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      // Créer l'élément img
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      img.style.display = 'block';
+      img.style.margin = '16px 0';
+      img.style.borderRadius = '8px';
+      
+      // Insérer l'image dans l'éditeur
+      const editor = document.getElementById('editor');
+      editor.focus();
+      
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(img);
+        
+        // Placer le curseur après l'image
+        range.setStartAfter(img);
+        range.setEndAfter(img);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      
+      closeImageModal();
     }
 
     // Gestion des emojis
