@@ -402,22 +402,25 @@
     }
 
     .collapsible-action-btn {
-      width: 20px;
-      height: 20px;
-      border: none;
-      background: transparent;
+      width: 24px;
+      height: 24px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 4px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #9ca3af;
+      color: #6b7280;
       font-size: 16px;
       transition: all 0.2s;
       padding: 0;
     }
 
     .collapsible-action-btn:hover {
-      color: #6b7280;
+      color: #374151;
+      background: #f9fafb;
+      border-color: #9ca3af;
     }
 
     /* Actions */
@@ -1086,14 +1089,14 @@
       const sectionHTML = `<div class="collapsible-section" contenteditable="false">
           <div class="collapsible-actions">
             <button class="collapsible-action-btn" onclick="copySection(event, this)" title="Copier la section">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="4" y="4" width="8" height="10" rx="1"/>
-                <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H13.5C13.78 2 14 2.22 14 2.5V11.5C14 11.78 13.78 12 13.5 12H12"/>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="5" width="8" height="9" rx="1"/>
+                <path d="M11 5V3.5C11 3.22 10.78 3 10.5 3H3.5C3.22 3 3 3.22 3 3.5V10.5C3 10.78 3.22 11 3.5 11H5"/>
               </svg>
             </button>
             <button class="collapsible-action-btn" onclick="deleteSection(event, this)" title="Supprimer la section">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M3 4h10M6.5 2h3M6 6v6M10 6v6M4.5 4l.5 9c0 .5.5 1 1 1h4c.5 0 1-.5 1-1l.5-9"/>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 4h12M6 2h4M6 6v6M10 6v6M4 4l.5 9c0 .5.5 1 1 1h5c.5 0 1-.5 1-1l.5-9"/>
               </svg>
             </button>
           </div>
