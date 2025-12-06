@@ -472,7 +472,6 @@
   </div>
 
   <script>
-    let grist;
     let currentContent = '';
     
     // Emojis populaires - ajout des emojis sociaux en début
@@ -485,43 +484,50 @@
       '📝', '📌', '📍', '🔔', '💡', '🎯', '🎉', '🎊'
     ];
 
-    // Initialisation de Grist
-    grist.ready({
-      requiredAccess: 'full',
-      columns: [{
-        name: 'content',
-        title: 'Content',
-        type: 'Text',
-        optional: true
-      }]
-    });
+    // Initialisation
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
 
-    grist.onOptions(function(options, interaction) {
-      if (interaction) {
-        // Mode configuration
-        document.getElementById('configMode').style.display = 'block';
-        document.getElementById('displayMode').style.display = 'none';
-        
-        // Charger le contenu existant
-        const savedContent = options?.content || '';
-        document.getElementById('editor').innerHTML = savedContent;
-        currentContent = savedContent;
-        
-        initializeEmojiPicker();
-      }
-    });
+    function init() {
+      // Initialisation de Grist
+      grist.ready({
+        requiredAccess: 'full',
+        columns: [],
+        onEditOptions: async function() {
+          const options = await grist.getOptions();
+          
+          // Mode configuration
+          document.getElementById('configMode').style.display = 'block';
+          document.getElementById('displayMode').style.display = 'none';
+          
+          // Charger le contenu existant
+          const savedContent = options?.content || '';
+          document.getElementById('editor').innerHTML = savedContent;
+          currentContent = savedContent;
+          
+          initializeEmojiPicker();
+        }
+      });
 
-    grist.onRecords(function(records) {
-      // Mode affichage
-      if (document.getElementById('configMode').style.display === 'none') {
-        const options = grist.widgetApi.getOptions();
-        const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
-        document.getElementById('displayContent').innerHTML = content;
-        
-        // Réinitialiser les sections repliables
-        initCollapsibles();
-      }
-    });
+      grist.onRecords(function(records) {
+        // Mode affichage
+        if (document.getElementById('configMode').style.display === 'none') {
+          grist.getOptions().then(options => {
+            const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
+            document.getElementById('displayContent').innerHTML = content;
+            
+            // Réinitialiser les sections repliables
+            initCollapsibles();
+          });
+        }
+      });
+      
+      // Initialiser l'emoji picker au démarrage
+      initializeEmojiPicker();
+    }
 
     // Commandes d'édition
     function execCmd(command, value = null) {
@@ -686,8 +692,6 @@
       document.getElementById('displayContent').innerHTML = content;
       
       initCollapsibles();
-      
-      grist.widgetApi.closeOptions();
     }
 
     function cancelEdit() {
@@ -697,8 +701,6 @@
       // Retour au mode affichage
       document.getElementById('configMode').style.display = 'none';
       document.getElementById('displayMode').style.display = 'block';
-      
-      grist.widgetApi.closeOptions();
     }
 
     // Raccourcis clavier
@@ -719,11 +721,6 @@
             break;
         }
       }
-    });
-
-    // Initialisation au chargement
-    window.addEventListener('load', function() {
-      initializeEmojiPicker();
     });
   </script>
 </body>
