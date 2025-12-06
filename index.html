@@ -461,22 +461,14 @@
 
     // Initialisation de Grist
     grist.ready({
-      requiredAccess: 'full',
-      columns: [{
-        name: 'content',
-        title: 'Content',
-        type: 'Text',
-        optional: true
-      }]
-    });
-
-    grist.onOptions(function(options, interaction) {
-      if (interaction) {
+      requiredAccess: 'read table',
+      onEditOptions: async function() {
         // Mode configuration
         document.getElementById('configMode').style.display = 'block';
         document.getElementById('displayMode').style.display = 'none';
         
         // Charger le contenu existant
+        const options = await grist.widgetApi.getOptions();
         const savedContent = options?.content || '';
         document.getElementById('editor').innerHTML = savedContent;
         currentContent = savedContent;
@@ -485,10 +477,10 @@
       }
     });
 
-    grist.onRecords(function(records) {
+    grist.onRecords(async function(records) {
       // Mode affichage
       if (document.getElementById('configMode').style.display === 'none') {
-        const options = grist.widgetApi.getOptions();
+        const options = await grist.widgetApi.getOptions();
         const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
         document.getElementById('displayContent').innerHTML = content;
         
@@ -607,8 +599,6 @@
       document.getElementById('displayContent').innerHTML = content;
       
       initCollapsibles();
-      
-      grist.widgetApi.closeOptions();
     }
 
     function cancelEdit() {
@@ -618,8 +608,6 @@
       // Retour au mode affichage
       document.getElementById('configMode').style.display = 'none';
       document.getElementById('displayMode').style.display = 'block';
-      
-      grist.widgetApi.closeOptions();
     }
 
     // Raccourcis clavier
