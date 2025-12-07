@@ -361,15 +361,16 @@
       padding: 12px 16px;
       cursor: pointer;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 12px;
       font-weight: 500;
       user-select: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 6px 6px 0 0;
     }
 
     .section-title {
       outline: none;
+      flex: 1;
     }
 
     .section-title[contenteditable="true"] {
@@ -379,6 +380,33 @@
     #displayMode .section-title {
       pointer-events: none;
       user-select: none;
+    }
+
+    .section-delete-btn {
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: rgba(0, 0, 0, 0.1);
+      color: #6b7280;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .section-delete-btn:hover {
+      background: rgba(0, 0, 0, 0.2);
+      color: #374151;
+    }
+
+    #displayMode .section-delete-btn {
+      display: none;
     }
 
     .collapsible-header:hover {
@@ -573,25 +601,25 @@
           <div id="sectionColorDropdown" class="color-dropdown">
             <div class="color-presets">
               <button class="color-preset" style="background: #f3f4f6;" onclick="insertCollapsibleWithColor('rgba(243, 244, 246, 1)')" title="Gris par défaut"></button>
-              <button class="color-preset" style="background: #E5E5E5;" onclick="insertCollapsibleWithColor('rgba(0, 0, 0, 0.05)')" title="Gris"></button>
-              <button class="color-preset" style="background: #D1D5DB;" onclick="insertCollapsibleWithColor('rgba(55, 65, 81, 0.1)')" title="Gris foncé"></button>
-              <button class="color-preset" style="background: #FEE2E2;" onclick="insertCollapsibleWithColor('rgba(220, 38, 38, 0.15)')" title="Rouge"></button>
-              <button class="color-preset" style="background: #FECACA;" onclick="insertCollapsibleWithColor('rgba(239, 68, 68, 0.15)')" title="Rouge clair"></button>
-              <button class="color-preset" style="background: #FFEDD5;" onclick="insertCollapsibleWithColor('rgba(234, 88, 12, 0.15)')" title="Orange foncé"></button>
-              <button class="color-preset" style="background: #FED7AA;" onclick="insertCollapsibleWithColor('rgba(249, 115, 22, 0.15)')" title="Orange"></button>
-              <button class="color-preset" style="background: #FDE68A;" onclick="insertCollapsibleWithColor('rgba(245, 158, 11, 0.15)')" title="Ambre"></button>
-              <button class="color-preset" style="background: #FEF3C7;" onclick="insertCollapsibleWithColor('rgba(251, 191, 36, 0.2)')" title="Jaune"></button>
-              <button class="color-preset" style="background: #ECFCCB;" onclick="insertCollapsibleWithColor('rgba(132, 204, 22, 0.15)')" title="Lime"></button>
-              <button class="color-preset" style="background: #D1FAE5;" onclick="insertCollapsibleWithColor('rgba(16, 185, 129, 0.15)')" title="Vert"></button>
-              <button class="color-preset" style="background: #CCFBF1;" onclick="insertCollapsibleWithColor('rgba(20, 184, 166, 0.15)')" title="Teal"></button>
-              <button class="color-preset" style="background: #CFFAFE;" onclick="insertCollapsibleWithColor('rgba(6, 182, 212, 0.15)')" title="Cyan"></button>
-              <button class="color-preset" style="background: #DBEAFE;" onclick="insertCollapsibleWithColor('rgba(14, 165, 233, 0.15)')" title="Bleu ciel"></button>
-              <button class="color-preset" style="background: #DBEAFE;" onclick="insertCollapsibleWithColor('rgba(59, 130, 246, 0.15)')" title="Bleu"></button>
-              <button class="color-preset" style="background: #E0E7FF;" onclick="insertCollapsibleWithColor('rgba(99, 102, 241, 0.15)')" title="Indigo"></button>
-              <button class="color-preset" style="background: #EDE9FE;" onclick="insertCollapsibleWithColor('rgba(139, 92, 246, 0.15)')" title="Violet"></button>
-              <button class="color-preset" style="background: #F3E8FF;" onclick="insertCollapsibleWithColor('rgba(168, 85, 247, 0.15)')" title="Mauve"></button>
-              <button class="color-preset" style="background: #FAE8FF;" onclick="insertCollapsibleWithColor('rgba(217, 70, 239, 0.15)')" title="Fuchsia"></button>
-              <button class="color-preset" style="background: #FCE7F3;" onclick="insertCollapsibleWithColor('rgba(236, 72, 153, 0.15)')" title="Rose"></button>
+              <button class="color-preset" style="background: #000000;" onclick="insertCollapsibleWithColor('rgba(0, 0, 0, 0.05)')" title="Gris"></button>
+              <button class="color-preset" style="background: #374151;" onclick="insertCollapsibleWithColor('rgba(55, 65, 81, 0.1)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="insertCollapsibleWithColor('rgba(220, 38, 38, 0.15)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="insertCollapsibleWithColor('rgba(239, 68, 68, 0.15)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="insertCollapsibleWithColor('rgba(234, 88, 12, 0.15)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="insertCollapsibleWithColor('rgba(249, 115, 22, 0.15)')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="insertCollapsibleWithColor('rgba(245, 158, 11, 0.15)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="insertCollapsibleWithColor('rgba(251, 191, 36, 0.2)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="insertCollapsibleWithColor('rgba(132, 204, 22, 0.15)')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="insertCollapsibleWithColor('rgba(16, 185, 129, 0.15)')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="insertCollapsibleWithColor('rgba(20, 184, 166, 0.15)')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="insertCollapsibleWithColor('rgba(6, 182, 212, 0.15)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="insertCollapsibleWithColor('rgba(14, 165, 233, 0.15)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="insertCollapsibleWithColor('rgba(59, 130, 246, 0.15)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="insertCollapsibleWithColor('rgba(99, 102, 241, 0.15)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="insertCollapsibleWithColor('rgba(139, 92, 246, 0.15)')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="insertCollapsibleWithColor('rgba(168, 85, 247, 0.15)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="insertCollapsibleWithColor('rgba(217, 70, 239, 0.15)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="insertCollapsibleWithColor('rgba(236, 72, 153, 0.15)')" title="Rose"></button>
             </div>
           </div>
         </div>
@@ -660,27 +688,27 @@
           </button>
           <div id="bgColorDropdown" class="color-dropdown">
             <div class="color-presets">
-              <button class="color-preset" style="background: #E5E5E5;" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
-              <button class="color-preset" style="background: #D1D5DB;" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
-              <button class="color-preset" style="background: #D1D5DB;" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
-              <button class="color-preset" style="background: #E5E7EB;" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
-              <button class="color-preset" style="background: #FEE2E2;" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
-              <button class="color-preset" style="background: #FECACA;" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
-              <button class="color-preset" style="background: #FFEDD5;" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
-              <button class="color-preset" style="background: #FED7AA;" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
-              <button class="color-preset" style="background: #FDE68A;" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
-              <button class="color-preset" style="background: #FEF3C7;" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
-              <button class="color-preset" style="background: #ECFCCB;" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
-              <button class="color-preset" style="background: #D1FAE5;" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
-              <button class="color-preset" style="background: #CCFBF1;" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
-              <button class="color-preset" style="background: #CFFAFE;" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
-              <button class="color-preset" style="background: #DBEAFE;" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
-              <button class="color-preset" style="background: #DBEAFE;" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
-              <button class="color-preset" style="background: #E0E7FF;" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
-              <button class="color-preset" style="background: #EDE9FE;" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
-              <button class="color-preset" style="background: #F3E8FF;" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
-              <button class="color-preset" style="background: #FAE8FF;" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
-              <button class="color-preset" style="background: #FCE7F3;" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
+              <button class="color-preset" style="background: #000000;" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
+              <button class="color-preset" style="background: #374151;" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #6B7280;" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
+              <button class="color-preset" style="background: #9CA3AF;" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
             </div>
             <div class="color-custom">
               <input type="text" id="customBgColorInput" placeholder="#HEX" />
@@ -1111,11 +1139,20 @@
       document.getElementById('sectionColorDropdown').classList.remove('active');
     }
 
+    function deleteSection(event) {
+      event.stopPropagation();
+      const section = event.target.closest('.collapsible-section');
+      if (section) {
+        section.remove();
+      }
+    }
+
     function insertCollapsible() {
-      const bgColor = selectedSectionColor || 'var(--hover)';
-      const sectionHTML = `<div class="collapsible-section" contenteditable="false" style="background-color: ${bgColor};">
-          <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: transparent;">
+      const bgColor = selectedSectionColor || 'rgba(243, 244, 246, 1)';
+      const sectionHTML = `<div class="collapsible-section" contenteditable="false">
+          <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: ${bgColor};">
             <span class="section-title">Titre de la section</span>
+            <button class="section-delete-btn" onclick="deleteSection(event)" title="Supprimer la section">×</button>
             <span class="collapsible-arrow">▼</span>
           </div>
           <div class="collapsible-content" contenteditable="true">
@@ -1141,40 +1178,7 @@
       }
     }
 
-    // Gérer la suppression avec Delete quand on sélectionne la section
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          let node = range.commonAncestorContainer;
-          
-          // Remonter pour trouver la section
-          while (node && node.nodeType !== 1) {
-            node = node.parentNode;
-          }
-          
-          while (node && node !== document.getElementById('editor')) {
-            if (node.classList && node.classList.contains('collapsible-section')) {
-              // Si on a sélectionné toute la section ou qu'on est dedans
-              if (selection.toString().length > 20 || range.startContainer === range.endContainer) {
-                e.preventDefault();
-                const nextSibling = node.nextElementSibling;
-                node.remove();
-                
-                // Si c'était juste un <br>, le supprimer aussi
-                if (nextSibling && nextSibling.tagName === 'P' && nextSibling.innerHTML === '<br>') {
-                  nextSibling.remove();
-                }
-                return;
-              }
-              break;
-            }
-            node = node.parentNode;
-          }
-        }
-      }
-    });
+
 
     function toggleCollapsible(header) {
       const section = header.parentElement;
