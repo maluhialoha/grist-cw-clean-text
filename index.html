@@ -368,6 +368,10 @@
       border-radius: 6px 6px 0 0;
     }
 
+    .collapsible-header-spacer {
+      flex: 1;
+    }
+
     .section-title:focus {
       outline: 2px solid var(--primary);
       outline-offset: 2px;
@@ -376,7 +380,8 @@
 
     .section-title {
       outline: none;
-      flex: 1;
+      display: inline-block;
+      min-width: 100px;
     }
 
     .section-title[contenteditable="true"] {
@@ -388,7 +393,13 @@
       user-select: none;
     }
 
-    .section-delete-btn {
+    .section-title:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+        .section-delete-btn {
       border: none;
       background: transparent;
       color: #6b7280;
@@ -1167,6 +1178,7 @@
       const sectionHTML = `<div class="collapsible-section" contenteditable="false">
           <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: ${bgColor};">
             <span class="section-title" contenteditable="true">Titre de la section</span>
+            <span class="collapsible-header-spacer"></span>
             <button class="section-delete-btn" onclick="deleteSection(event)" title="Supprimer la section">Supprimer</button>
             <span class="collapsible-arrow">▼</span>
           </div>
@@ -1201,9 +1213,11 @@
           event.target.classList.contains('section-delete-btn')) {
         return;
       }
-      const header = event.currentTarget || event;
-      const section = header.parentElement || header.parentElement;
-      section.classList.toggle('collapsed');
+      const header = event.currentTarget;
+      const section = header.closest('.collapsible-section');
+      if (section) {
+        section.classList.toggle('collapsed');
+      }
     }
 
 function initCollapsibles() {
