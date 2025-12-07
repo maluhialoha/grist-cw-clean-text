@@ -358,13 +358,26 @@
     }
 
     .collapsible-header {
-      background: var(--hover);
       padding: 12px 16px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-weight: 500;
+      user-select: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+      outline: none;
+    }
+
+    .section-title[contenteditable="true"] {
+      cursor: text;
+    }
+
+    #displayMode .section-title {
+      pointer-events: none;
       user-select: none;
     }
 
@@ -389,35 +402,6 @@
 
     .collapsible-section.collapsed .collapsible-content {
       display: none;
-    }
-
-    .collapsible-actions {
-      display: flex;
-      gap: 6px;
-      margin-left: auto;
-      margin-right: 8px;
-    }
-
-    .collapsible-action-btn {
-      width: 24px;
-      height: 24px;
-      border: 1px solid #d1d5db;
-      background: white;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #6b7280;
-      font-size: 16px;
-      transition: all 0.2s;
-      padding: 0;
-    }
-
-    .collapsible-action-btn:hover {
-      color: #374151;
-      background: #f9fafb;
-      border-color: #9ca3af;
     }
 
     /* Actions */
@@ -582,9 +566,35 @@
         <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
           <span style="font-size: 18px; line-height: 1;">•</span>
         </button>
-        <button class="toolbar-btn" onclick="insertCollapsible()" title="Section repliable">
-          <span style="font-size: 14px;">▼</span>
-        </button>
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="showSectionColorPicker()" title="Section repliable">
+            <span style="font-size: 14px;">▼</span>
+          </button>
+          <div id="sectionColorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: #f3f4f6;" onclick="insertCollapsibleWithColor('rgba(243, 244, 246, 1)')" title="Gris par défaut"></button>
+              <button class="color-preset" style="background: #E5E5E5;" onclick="insertCollapsibleWithColor('rgba(0, 0, 0, 0.05)')" title="Gris"></button>
+              <button class="color-preset" style="background: #D1D5DB;" onclick="insertCollapsibleWithColor('rgba(55, 65, 81, 0.1)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #FEE2E2;" onclick="insertCollapsibleWithColor('rgba(220, 38, 38, 0.15)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #FECACA;" onclick="insertCollapsibleWithColor('rgba(239, 68, 68, 0.15)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #FFEDD5;" onclick="insertCollapsibleWithColor('rgba(234, 88, 12, 0.15)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #FED7AA;" onclick="insertCollapsibleWithColor('rgba(249, 115, 22, 0.15)')" title="Orange"></button>
+              <button class="color-preset" style="background: #FDE68A;" onclick="insertCollapsibleWithColor('rgba(245, 158, 11, 0.15)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FEF3C7;" onclick="insertCollapsibleWithColor('rgba(251, 191, 36, 0.2)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #ECFCCB;" onclick="insertCollapsibleWithColor('rgba(132, 204, 22, 0.15)')" title="Lime"></button>
+              <button class="color-preset" style="background: #D1FAE5;" onclick="insertCollapsibleWithColor('rgba(16, 185, 129, 0.15)')" title="Vert"></button>
+              <button class="color-preset" style="background: #CCFBF1;" onclick="insertCollapsibleWithColor('rgba(20, 184, 166, 0.15)')" title="Teal"></button>
+              <button class="color-preset" style="background: #CFFAFE;" onclick="insertCollapsibleWithColor('rgba(6, 182, 212, 0.15)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #DBEAFE;" onclick="insertCollapsibleWithColor('rgba(14, 165, 233, 0.15)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #DBEAFE;" onclick="insertCollapsibleWithColor('rgba(59, 130, 246, 0.15)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #E0E7FF;" onclick="insertCollapsibleWithColor('rgba(99, 102, 241, 0.15)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #EDE9FE;" onclick="insertCollapsibleWithColor('rgba(139, 92, 246, 0.15)')" title="Violet"></button>
+              <button class="color-preset" style="background: #F3E8FF;" onclick="insertCollapsibleWithColor('rgba(168, 85, 247, 0.15)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #FAE8FF;" onclick="insertCollapsibleWithColor('rgba(217, 70, 239, 0.15)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #FCE7F3;" onclick="insertCollapsibleWithColor('rgba(236, 72, 153, 0.15)')" title="Rose"></button>
+            </div>
+          </div>
+        </div>
         <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
           <span style="font-size: 16px;">😀</span>
         </button>
@@ -961,8 +971,10 @@
     document.addEventListener('click', function(e) {
       const colorDropdown = document.getElementById('colorDropdown');
       const bgColorDropdown = document.getElementById('bgColorDropdown');
+      const sectionColorDropdown = document.getElementById('sectionColorDropdown');
       const colorBtn = e.target.closest('[onclick*="toggleColorDropdown"]');
       const bgColorBtn = e.target.closest('[onclick*="toggleBgColorDropdown"]');
+      const sectionBtn = e.target.closest('[onclick*="showSectionColorPicker"]');
       
       if (colorDropdown && !colorDropdown.contains(e.target) && !colorBtn) {
         colorDropdown.classList.remove('active');
@@ -970,6 +982,10 @@
       
       if (bgColorDropdown && !bgColorDropdown.contains(e.target) && !bgColorBtn) {
         bgColorDropdown.classList.remove('active');
+      }
+      
+      if (sectionColorDropdown && !sectionColorDropdown.contains(e.target) && !sectionBtn) {
+        sectionColorDropdown.classList.remove('active');
       }
     });
 
@@ -1082,23 +1098,24 @@
     });
 
     // Section repliable
+    let selectedSectionColor = '';
+
+    function showSectionColorPicker() {
+      const dropdown = document.getElementById('sectionColorDropdown');
+      dropdown.classList.toggle('active');
+    }
+
+    function insertCollapsibleWithColor(color) {
+      selectedSectionColor = color;
+      insertCollapsible();
+      document.getElementById('sectionColorDropdown').classList.remove('active');
+    }
+
     function insertCollapsible() {
-      const sectionHTML = `<div class="collapsible-section" contenteditable="false">
-          <div class="collapsible-header" onclick="toggleCollapsible(this)">
-            <span contenteditable="true">Titre de la section</span>
-            <div class="collapsible-actions">
-              <button class="collapsible-action-btn" onclick="copySection(event, this)" title="Copier la section">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="5" y="5" width="8" height="9" rx="1"/>
-                  <path d="M11 5V3.5C11 3.22 10.78 3 10.5 3H3.5C3.22 3 3 3.22 3 3.5V10.5C3 10.78 3.22 11 3.5 11H5"/>
-                </svg>
-              </button>
-              <button class="collapsible-action-btn" onclick="deleteSection(event, this)" title="Supprimer la section">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M2 4h12M6 2h4M6 6v6M10 6v6M4 4l.5 9c0 .5.5 1 1 1h5c.5 0 1-.5 1-1l.5-9"/>
-                </svg>
-              </button>
-            </div>
+      const bgColor = selectedSectionColor || 'var(--hover)';
+      const sectionHTML = `<div class="collapsible-section" contenteditable="false" style="background-color: ${bgColor};">
+          <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: transparent;">
+            <span class="section-title">Titre de la section</span>
             <span class="collapsible-arrow">▼</span>
           </div>
           <div class="collapsible-content" contenteditable="true">
@@ -1107,6 +1124,7 @@
         </div>
         <p><br></p>`;
       
+      selectedSectionColor = '';
       document.execCommand('insertHTML', false, sectionHTML);
       
       // Placer le curseur après la section
@@ -1123,37 +1141,40 @@
       }
     }
 
-    function deleteSection(event, btn) {
-      event.stopPropagation();
-      const section = btn.closest('.collapsible-section');
-      if (section && confirm('Supprimer cette section ?')) {
-        section.remove();
-      }
-    }
-
-    function copySection(event, btn) {
-      event.stopPropagation();
-      const section = btn.closest('.collapsible-section');
-      if (section) {
-        // Créer une copie de la section
-        const clone = section.cloneNode(true);
-        
-        // Insérer après la section actuelle
-        const nextElement = section.nextElementSibling;
-        if (nextElement) {
-          section.parentNode.insertBefore(clone, nextElement);
-        } else {
-          section.parentNode.appendChild(clone);
+    // Gérer la suppression avec Delete quand on sélectionne la section
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          let node = range.commonAncestorContainer;
+          
+          // Remonter pour trouver la section
+          while (node && node.nodeType !== 1) {
+            node = node.parentNode;
+          }
+          
+          while (node && node !== document.getElementById('editor')) {
+            if (node.classList && node.classList.contains('collapsible-section')) {
+              // Si on a sélectionné toute la section ou qu'on est dedans
+              if (selection.toString().length > 20 || range.startContainer === range.endContainer) {
+                e.preventDefault();
+                const nextSibling = node.nextElementSibling;
+                node.remove();
+                
+                // Si c'était juste un <br>, le supprimer aussi
+                if (nextSibling && nextSibling.tagName === 'P' && nextSibling.innerHTML === '<br>') {
+                  nextSibling.remove();
+                }
+                return;
+              }
+              break;
+            }
+            node = node.parentNode;
+          }
         }
-        
-        // Ajouter un paragraphe vide après si nécessaire
-        if (!clone.nextElementSibling || clone.nextElementSibling.tagName !== 'P') {
-          const p = document.createElement('p');
-          p.innerHTML = '<br>';
-          clone.parentNode.insertBefore(p, clone.nextElementSibling);
-        }
       }
-    }
+    });
 
     function toggleCollapsible(header) {
       const section = header.parentElement;
@@ -1166,6 +1187,18 @@
         header.onclick = function() {
           toggleCollapsible(this);
         };
+      });
+      
+      // Gérer l'édition du titre en mode config
+      const configMode = document.getElementById('configMode');
+      const isConfigMode = configMode && configMode.style.display !== 'none';
+      
+      document.querySelectorAll('.section-title').forEach(title => {
+        if (isConfigMode) {
+          title.setAttribute('contenteditable', 'true');
+        } else {
+          title.removeAttribute('contenteditable');
+        }
       });
     }
 
