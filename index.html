@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grist Text Editor Widget</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;700&family=Raleway:wght@300;400;500;700&family=Oswald:wght@300;400;500;700&family=Nunito:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     @font-face {
       font-family: 'Marianne';
@@ -640,8 +640,15 @@
         </select>
         <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
           <option value="">Police</option>
-          <option value="'Marianne', sans-serif">Marianne</option>
+          <option value="'Marianne', sans-serif">Marianne (réservée à l'État)</option>
           <option value="Inter, sans-serif">Inter</option>
+          <option value="'Open Sans', sans-serif">Open Sans</option>
+          <option value="Roboto, sans-serif">Roboto</option>
+          <option value="Lato, sans-serif">Lato</option>
+          <option value="Montserrat, sans-serif">Montserrat</option>
+          <option value="Raleway, sans-serif">Raleway</option>
+          <option value="Oswald, sans-serif">Oswald</option>
+          <option value="Nunito, sans-serif">Nunito</option>
           <option value="Arial, sans-serif">Arial</option>
           <option value="Helvetica, sans-serif">Helvetica</option>
           <option value="Verdana, sans-serif">Verdana</option>
