@@ -1179,7 +1179,7 @@
     function insertCollapsible() {
       const bgColor = selectedSectionColor || 'rgba(243, 244, 246, 1)';
       const sectionHTML = `<div class="collapsible-section" contenteditable="false">
-          <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: ${bgColor};">
+          <div class="collapsible-header" style="background-color: ${bgColor};">
             <span class="section-title" contenteditable="true">Titre de la section</span>
             <span class="collapsible-header-spacer"></span>
             <button class="section-delete-btn" onclick="deleteSection(event)" title="Supprimer la section">Supprimer</button>
@@ -1206,6 +1206,12 @@
         sel.removeAllRanges();
         sel.addRange(range);
       }
+
+      // Ré-initialiser correctement les sections après insertion
+      setTimeout(() => {
+       initCollapsibles();
+      }, 50);
+
     }
 
 
@@ -1223,36 +1229,46 @@
       }
     }
 
-function initCollapsibles() {
-      const headers = document.querySelectorAll('.collapsible-header');
-      headers.forEach(header => {
-        header.onclick = function(e) {
-          toggleCollapsible(e);
-        };
-      });
-      
-      // Gérer l'édition du titre et du contenu en mode config
-      const configMode = document.getElementById('configMode');
-      const isConfigMode = configMode && configMode.style.display !== 'none';
-      
-      document.querySelectorAll('.section-title').forEach(title => {
-        if (isConfigMode) {
-          title.setAttribute('contenteditable', 'true');
-        } else {
-          title.removeAttribute('contenteditable');
-        }
-      });
-      
-      document.querySelectorAll('.collapsible-content').forEach(content => {
-        if (isConfigMode) {
-          content.setAttribute('contenteditable', 'true');
-          content.style.pointerEvents = '';
-        } else {
-          content.setAttribute('contenteditable', 'false');
-          content.style.pointerEvents = 'none';
-        }
-      });
+     function initCollapsibles() {
+  // Activer/désactiver le mode edition
+  const configMode = document.getElementById('configMode');
+  const isConfigMode = configMode && configMode.style.display !== 'none';
+
+  // Event delegation : gère tous les clics sur les headers
+  document.addEventListener('click', function(e) {
+    const header = e.target.closest('.collapsible-header');
+    if (!header) return;
+
+    // pas de toggle si clic sur titre ou bouton supprimer
+    if (e.target.classList.contains('section-title') ||
+        e.target.classList.contains('section-delete-btn')) {
+      return;
     }
+
+    const section = header.closest('.collapsible-section');
+    if (section) section.classList.toggle('collapsed');
+  });
+
+  // Mode édition des titres
+  document.querySelectorAll('.section-title').forEach(title => {
+    if (isConfigMode) {
+      title.setAttribute('contenteditable', 'true');
+    } else {
+      title.removeAttribute('contenteditable');
+    }
+  });
+
+  // Mode édition du contenu
+  document.querySelectorAll('.collapsible-content').forEach(content => {
+    if (isConfigMode) {
+      content.setAttribute('contenteditable', 'true');
+      content.style.pointerEvents = '';
+    } else {
+      content.setAttribute('contenteditable', 'false');
+      content.style.pointerEvents = 'none';
+    }
+  });
+}
 
     // Sauvegarde
     async function saveContent() {
