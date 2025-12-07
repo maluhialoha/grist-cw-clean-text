@@ -383,26 +383,20 @@
     }
 
     .section-delete-btn {
-      width: 24px;
-      height: 24px;
       border: none;
-      background: rgba(0, 0, 0, 0.1);
+      background: transparent;
       color: #6b7280;
-      border-radius: 4px;
       cursor: pointer;
-      font-size: 20px;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
+      font-size: 13px;
+      text-decoration: underline;
+      padding: 0 4px;
       transition: all 0.2s;
       flex-shrink: 0;
+      font-family: inherit;
     }
 
     .section-delete-btn:hover {
-      background: rgba(0, 0, 0, 0.2);
-      color: #374151;
+      color: #dc2626;
     }
 
     #displayMode .section-delete-btn {
@@ -430,6 +424,11 @@
 
     .collapsible-section.collapsed .collapsible-content {
       display: none;
+    }
+
+    #displayMode .collapsible-content {
+      pointer-events: none;
+      user-select: text;
     }
 
     /* Actions */
@@ -1152,7 +1151,7 @@
       const sectionHTML = `<div class="collapsible-section" contenteditable="false">
           <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: ${bgColor};">
             <span class="section-title">Titre de la section</span>
-            <button class="section-delete-btn" onclick="deleteSection(event)" title="Supprimer la section">×</button>
+            <button class="section-delete-btn" onclick="deleteSection(event)" title="Supprimer la section">Supprimer</button>
             <span class="collapsible-arrow">▼</span>
           </div>
           <div class="collapsible-content" contenteditable="true">
@@ -1193,7 +1192,7 @@
         };
       });
       
-      // Gérer l'édition du titre en mode config
+      // Gérer l'édition du titre et du contenu en mode config
       const configMode = document.getElementById('configMode');
       const isConfigMode = configMode && configMode.style.display !== 'none';
       
@@ -1202,6 +1201,14 @@
           title.setAttribute('contenteditable', 'true');
         } else {
           title.removeAttribute('contenteditable');
+        }
+      });
+      
+      document.querySelectorAll('.collapsible-content').forEach(content => {
+        if (isConfigMode) {
+          content.setAttribute('contenteditable', 'true');
+        } else {
+          content.setAttribute('contenteditable', 'false');
         }
       });
     }
