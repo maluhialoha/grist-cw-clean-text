@@ -368,6 +368,12 @@
       border-radius: 6px 6px 0 0;
     }
 
+    .section-title:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
     .section-title {
       outline: none;
       flex: 1;
@@ -1160,7 +1166,7 @@
       const bgColor = selectedSectionColor || 'rgba(243, 244, 246, 1)';
       const sectionHTML = `<div class="collapsible-section" contenteditable="false">
           <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background-color: ${bgColor};">
-            <span class="section-title">Titre de la section</span>
+            <span class="section-title" contenteditable="true">Titre de la section</span>
             <button class="section-delete-btn" onclick="deleteSection(event)" title="Supprimer la section">Supprimer</button>
             <span class="collapsible-arrow">▼</span>
           </div>
@@ -1189,16 +1195,22 @@
 
 
 
-    function toggleCollapsible(header) {
-      const section = header.parentElement;
+    function toggleCollapsible(event) {
+      // Ne pas toggle si on clique sur le titre éditable ou le bouton supprimer
+      if (event.target.classList.contains('section-title') || 
+          event.target.classList.contains('section-delete-btn')) {
+        return;
+      }
+      const header = event.currentTarget || event;
+      const section = header.parentElement || header.parentElement;
       section.classList.toggle('collapsed');
     }
 
 function initCollapsibles() {
       const headers = document.querySelectorAll('.collapsible-header');
       headers.forEach(header => {
-        header.onclick = function() {
-          toggleCollapsible(this);
+        header.onclick = function(e) {
+          toggleCollapsible(e);
         };
       });
       
