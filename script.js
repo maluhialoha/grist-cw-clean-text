@@ -5,40 +5,7 @@
     // Emojis professionnels
     let collapsibleDelegationAdded = false;
 
-    function ensureCollapsibleDelegation() {
-      if (collapsibleDelegationAdded) return;
-      const editor = document.getElementById('editor');
-      if (!editor) return;
-      
-      editor.addEventListener('click', function(e) {
-        // Gestion du toggle de section
-        const header = e.target.closest('.collapsible-header');
-        if (header) {
-          // Si on clique dans le titre éditable ou sur le bouton supprimer => ne pas toggle
-          if (e.target.closest('.section-title') || e.target.closest('.section-delete-btn')) {
-            return;
-          }
-
-          const section = header.closest('.collapsible-section');
-          if (section) {
-            section.classList.toggle('collapsed');
-          }
-          return;
-        }
-        
-        // Gestion de la suppression
-        const deleteBtn = e.target.closest('.section-delete-btn');
-        if (deleteBtn) {
-          e.stopPropagation();
-          const section = deleteBtn.closest('.collapsible-section');
-          if (section) section.remove();
-        }
-      });
-      
-      collapsibleDelegationAdded = true;
-    }
-
-        const emojis = [
+    const emojis = [
       '😀', '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
       '😂', '🤣', '😉', '😎', '🤔', '😐', '😑', '😶',
       '🙄', '😮', '😯', '😲', '😳', '🥺', '😢', '😭',
@@ -61,8 +28,6 @@
     }
 
     function initGrist() {
-      // Initialiser la délégation des événements une seule fois
-      ensureCollapsibleDelegation();
       
       grist.ready({ 
         requiredAccess: 'read table',
@@ -90,10 +55,7 @@
             currentPadding = savedPadding;
             applyPadding(savedPadding);
           }
-          
-          // Réinitialiser les sections en mode config aussi
-          initCollapsibles();
-          
+                    
           initializeEmojiPicker();
         }
       });
@@ -125,8 +87,6 @@
             }
           }
           
-          // Réinitialiser les sections repliables
-          initCollapsibles();
         }
       });
     }
@@ -394,104 +354,6 @@
       }
     });
 
-    // Section repliable
-    let selectedSectionColor = '';
-
-    function showSectionColorPicker() {
-      const dropdown = document.getElementById('sectionColorDropdown');
-      dropdown.classList.toggle('active');
-    }
-
-    function insertCollapsibleWithColor(color) {
-      selectedSectionColor = color;
-      insertCollapsible();
-      document.getElementById('sectionColorDropdown').classList.remove('active');
-    }
-
-
-    function insertCollapsible() {
-      const bgColor = selectedSectionColor || 'rgba(243, 244, 246, 1)';
-      const sectionHTML = `<div class="collapsible-section" contenteditable="false">
-          <div class="collapsible-header" style="background-color: ${bgColor};">
-            <span class="section-title" contenteditable="true">Titre de la section</span>
-            <span class="collapsible-header-spacer"></span>
-            <button class="section-delete-btn" title="Supprimer la section">Supprimer</button>
-            <span class="collapsible-arrow">▼</span>
-          </div>
-          <div class="collapsible-content" contenteditable="true">
-            <p>Contenu de la section...</p>
-          </div>
-        </div>
-        <p><br></p>`;
-      
-      selectedSectionColor = '';
-      
-      // Insérer proprement
-      const editor = document.getElementById('editor');
-      editor.insertAdjacentHTML('beforeend', sectionHTML);
-      
-      // Repositionner le curseur après la nouvelle section
-      const sections = editor.querySelectorAll('.collapsible-section');
-      const lastSection = sections[sections.length - 1];
-      if (lastSection && lastSection.nextElementSibling) {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.setStart(lastSection.nextElementSibling, 0);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-      
-      // Petit timeout pour laisser le DOM se stabiliser
-      setTimeout(() => {
-        initCollapsibles();
-      }, 30);
-    }
-
-        function toggleCollapsible(event) {
-      // Ne pas toggle si on clique sur le titre éditable ou le bouton supprimer
-      if (event.target.classList.contains('section-title') || 
-          event.target.classList.contains('section-delete-btn')) {
-        return;
-      }
-      const header = event.currentTarget;
-      const section = header.closest('.collapsible-section');
-      if (section) {
-        section.classList.toggle('collapsed');
-      }
-    }
-
-function initCollapsibles() {
-      const headers = document.querySelectorAll('.collapsible-header');
-      headers.forEach(header => {
-        header.onclick = function(e) {
-          toggleCollapsible(e);
-        };
-      });
-      
-      // Gérer l'édition du titre et du contenu en mode config
-      const configMode = document.getElementById('configMode');
-      const isConfigMode = configMode && configMode.style.display !== 'none';
-      
-      document.querySelectorAll('.section-title').forEach(title => {
-        if (isConfigMode) {
-          title.setAttribute('contenteditable', 'true');
-        } else {
-          title.removeAttribute('contenteditable');
-        }
-      });
-      
-      document.querySelectorAll('.collapsible-content').forEach(content => {
-        if (isConfigMode) {
-          content.setAttribute('contenteditable', 'true');
-          content.style.pointerEvents = '';
-        } else {
-          content.setAttribute('contenteditable', 'false');
-          content.style.pointerEvents = 'none';
-        }
-      });
-    }
-
     // Sauvegarde
     async function saveContent() {
       const content = document.getElementById('editor').innerHTML;
@@ -524,7 +386,6 @@ function initCollapsibles() {
         }
       }
       
-      initCollapsibles();
     }
 
     function cancelEdit() {
