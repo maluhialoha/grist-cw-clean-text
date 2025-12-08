@@ -1,81 +1,226 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Grist Text Editor Widget</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grist Text Editor Widget</title>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+   
+  </style>
 </head>
 <body>
+  <!-- Mode Configuration -->
+  <div id="configMode" class="config-mode" style="display: none;">
+    <div class="config-header">
+      <div class="config-actions">
+        <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
+        <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
+      </div>
+    </div>
 
-<!-- Mode Configuration -->
-<div id="configMode" class="config-mode" style="display: none;">
-  <div class="config-header">
-    <div class="config-actions">
-      <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
-      <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="execCmd('bold')" title="Gras (Ctrl+B)">
+          <strong style="font-size: 14px;">B</strong>
+        </button>
+        <button class="toolbar-btn" onclick="execCmd('italic')" title="Italique (Ctrl+I)">
+          <em style="font-size: 14px;">I</em>
+        </button>
+        <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)">
+          <u style="font-size: 14px;">U</u>
+        </button>
+        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
+          <span style="font-size: 16px;">🔗</span>
+        </button>
+        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
+          <span style="font-size: 18px; line-height: 1;">•</span>
+        </button>
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="showSectionColorPicker()" title="Section repliable">
+            <span style="font-size: 14px;">▼</span>
+          </button>
+          <div id="sectionColorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: #f3f4f6;" onclick="insertCollapsibleWithColor('rgba(243, 244, 246, 1)')" title="Gris par défaut"></button>
+              <button class="color-preset" style="background: #000000;" onclick="insertCollapsibleWithColor('rgba(0, 0, 0, 0.05)')" title="Gris"></button>
+              <button class="color-preset" style="background: #374151;" onclick="insertCollapsibleWithColor('rgba(55, 65, 81, 0.1)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="insertCollapsibleWithColor('rgba(220, 38, 38, 0.15)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="insertCollapsibleWithColor('rgba(239, 68, 68, 0.15)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="insertCollapsibleWithColor('rgba(234, 88, 12, 0.15)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="insertCollapsibleWithColor('rgba(249, 115, 22, 0.15)')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="insertCollapsibleWithColor('rgba(245, 158, 11, 0.15)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="insertCollapsibleWithColor('rgba(251, 191, 36, 0.2)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="insertCollapsibleWithColor('rgba(132, 204, 22, 0.15)')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="insertCollapsibleWithColor('rgba(16, 185, 129, 0.15)')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="insertCollapsibleWithColor('rgba(20, 184, 166, 0.15)')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="insertCollapsibleWithColor('rgba(6, 182, 212, 0.15)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="insertCollapsibleWithColor('rgba(14, 165, 233, 0.15)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="insertCollapsibleWithColor('rgba(59, 130, 246, 0.15)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="insertCollapsibleWithColor('rgba(99, 102, 241, 0.15)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="insertCollapsibleWithColor('rgba(139, 92, 246, 0.15)')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="insertCollapsibleWithColor('rgba(168, 85, 247, 0.15)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="insertCollapsibleWithColor('rgba(217, 70, 239, 0.15)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="insertCollapsibleWithColor('rgba(236, 72, 153, 0.15)')" title="Rose"></button>
+            </div>
+          </div>
+        </div>
+        <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
+          <span style="font-size: 16px;">😀</span>
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <select class="toolbar-btn" onchange="execCmd('formatBlock', this.value); this.selectedIndex=0;">
+          <option value="">Style</option>
+          <option value="h1">Titre 1</option>
+          <option value="h2">Titre 2</option>
+          <option value="h3">Titre 3</option>
+          <option value="p">Paragraphe</option>
+        </select>
+        <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
+          <option value="">Police</option>
+          <option value="'Marianne', sans-serif">Marianne (réservée à l'État)</option>
+          <option value="Inter, sans-serif">Inter</option>
+          <option value="'Open Sans', sans-serif">Open Sans</option>
+          <option value="Roboto, sans-serif">Roboto</option>
+          <option value="Lato, sans-serif">Lato</option>
+          <option value="Montserrat, sans-serif">Montserrat</option>
+          <option value="Raleway, sans-serif">Raleway</option>
+          <option value="Oswald, sans-serif">Oswald</option>
+          <option value="Nunito, sans-serif">Nunito</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Helvetica, sans-serif">Helvetica</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="'Courier New', monospace">Courier New</option>
+        </select>
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
+            <span style="color: #000000; font-weight: bold; font-size: 14px; display: inline-block; line-height: 1;" id="currentColorIcon">A</span>
+          </button>
+          <div id="colorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: #000000;" onclick="applyColor('#000000')" title="Noir"></button>
+              <button class="color-preset" style="background: #374151;" onclick="applyColor('#374151')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #6B7280;" onclick="applyColor('#6B7280')" title="Gris"></button>
+              <button class="color-preset" style="background: #9CA3AF;" onclick="applyColor('#9CA3AF')" title="Gris clair"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="applyColor('#DC2626')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="applyColor('#EF4444')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="applyColor('#EA580C')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="applyColor('#F97316')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyColor('#F59E0B')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="applyColor('#FBBF24')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="applyColor('#84CC16')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="applyColor('#10B981')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyColor('#14B8A6')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="applyColor('#06B6D4')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="applyColor('#0EA5E9')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="applyColor('#3B82F6')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="applyColor('#6366F1')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="applyColor('#8B5CF6')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="applyColor('#A855F7')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="applyColor('#D946EF')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="applyColor('#EC4899')" title="Rose"></button>
+            </div>
+            <div class="color-custom">
+              <input type="text" id="customColorInput" placeholder="#HEX" />
+              <button onclick="applyCustomColor()">OK</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="color-dropdown-wrapper">
+          <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de fond du texte">
+            <span style="background: rgba(255, 255, 0, 0.3); padding: 2px 6px; font-weight: bold; font-size: 14px; display: inline-block; line-height: 1;" id="currentBgColorIcon">A</span>
+          </button>
+          <div id="bgColorDropdown" class="color-dropdown">
+            <div class="color-presets">
+              <button class="color-preset" style="background: #000000;" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
+              <button class="color-preset" style="background: #374151;" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #6B7280;" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
+              <button class="color-preset" style="background: #9CA3AF;" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EF4444;" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
+            </div>
+            <div class="color-custom">
+              <input type="text" id="customBgColorInput" placeholder="#HEX" />
+              <button onclick="applyCustomBgColor()">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar-group">
+        <select class="toolbar-btn" id="paddingSelect" onchange="applyPadding(this.value)">
+          <option value="">Marges</option>
+          <option value="small">Petites</option>
+          <option value="medium">Moyennes</option>
+          <option value="large">Grandes</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div id="editor" contenteditable="true" data-placeholder="Commencez à écrire..."></div>
+    </div>
+
+    <!-- Emoji Picker -->
+    <div id="emojiPicker" class="emoji-picker"></div>
+  </div>
+
+  <!-- Mode Display -->
+  <div id="displayMode" class="display-mode">
+    <div id="displayContent" class="display-content"></div>
+  </div>
+
+  <!-- Modal pour les liens -->
+  <div id="linkModal" class="modal">
+    <div class="modal-content">
+      <h3>Ajouter un lien</h3>
+      <input type="text" id="linkText" placeholder="Texte du lien">
+      <input type="url" id="linkUrl" placeholder="https://exemple.com">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeLinkModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertLink()">Insérer</button>
+      </div>
     </div>
   </div>
 
-  <div class="toolbar">
-    <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="execCmd('bold')" title="Gras (Ctrl+B)"><strong>B</strong></button>
-      <button class="toolbar-btn" onclick="execCmd('italic')" title="Italique (Ctrl+I)"><em>I</em></button>
-      <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)"><u>U</u></button>
-      <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">🔗</button>
-      <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">•</button>
-      <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">😀</button>
-    </div>
-
-    <div class="toolbar-group">
-      <select class="toolbar-btn" onchange="execCmd('formatBlock', this.value); this.selectedIndex=0;">
-        <option value="">Style</option>
-        <option value="h1">Titre 1</option>
-        <option value="h2">Titre 2</option>
-        <option value="h3">Titre 3</option>
-        <option value="p">Paragraphe</option>
-      </select>
-      <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
-        <option value="">Police</option>
-        <option value="Inter, sans-serif">Inter</option>
-        <option value="'Open Sans', sans-serif">Open Sans</option>
-        <option value="Roboto, sans-serif">Roboto</option>
-      </select>
-    </div>
-
-    <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">A</button>
-      <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de fond">A</button>
+  <!-- Modal pour les images -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <h3>Ajouter une image</h3>
+      <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">
+        URL de l'image ou encodage base64
+      </p>
+      <input type="text" id="imageUrl" placeholder="https://exemple.com/image.jpg ou data:image/...">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeImageModal()">Annuler</button>
+        <button class="btn-primary" onclick="insertImage()">Insérer</button>
+      </div>
     </div>
   </div>
 
-  <div class="editor-container">
-    <div id="editor" contenteditable="true" data-placeholder="Commencez à écrire..."></div>
-  </div>
+  <script src="script.js"></script>
 
-  <!-- Emoji Picker -->
-  <div id="emojiPicker" class="emoji-picker"></div>
-</div>
-
-<!-- Mode Display -->
-<div id="displayMode" class="display-mode">
-  <div id="displayContent" class="display-content"></div>
-</div>
-
-<!-- Modals -->
-<div id="linkModal" class="modal">
-  <div class="modal-content">
-    <h3>Ajouter un lien</h3>
-    <input type="text" id="linkText" placeholder="Texte du lien">
-    <input type="url" id="linkUrl" placeholder="https://exemple.com">
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeLinkModal()">Annuler</button>
-      <button class="btn-primary" onclick="insertLink()">Insérer</button>
-    </div>
-  </div>
-</div>
-
-<script src="script.js"></script>
 </body>
 </html>
