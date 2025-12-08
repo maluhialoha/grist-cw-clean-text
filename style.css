@@ -1,0 +1,14 @@
+body { font-family: sans-serif; background: #fff; color: #111; margin: 0; padding: 0; }
+.toolbar { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid #ccc; }
+.toolbar-btn { padding: 6px 10px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; }
+.toolbar-btn:hover { background: #007bff; color: white; }
+.editor-container { border: 1px solid #ccc; min-height: 400px; padding: 10px; }
+#editor:empty:before { content: attr(data-placeholder); color: #999; }
+.display-mode { padding: 20px; }
+.modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+.modal.active { display: flex; }
+.modal-content { background:white; padding:20px; border-radius:6px; width: 90%; max-width:400px; }
+.emoji-picker { display:none; position:absolute; background:white; border:1px solid #ccc; padding:6px; grid-template-columns: repeat(8, 1fr); gap:4px; max-height:200px; overflow-y:auto; }
+.emoji-picker.active { display:grid; }
+.emoji-btn { font-size:20px; padding:4px; cursor:pointer; border:none; background:none; }
+.emoji-btn:hover { background:#eee; border-radius:4px; }
