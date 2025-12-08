@@ -7,6 +7,7 @@
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;700&family=Raleway:wght@300;400;500;700&family=Oswald:wght@300;400;500;700&family=Nunito:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
+
     @font-face {
       font-family: 'Marianne';
       font-style: normal;
@@ -92,17 +93,6 @@
       gap: 12px;
     }
 
-    .config-header h1 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .config-header p {
-      color: var(--text-light);
-      font-size: 14px;
-    }
-
     .config-actions {
       display: flex;
       gap: 12px;
@@ -163,14 +153,6 @@
 
     select.toolbar-btn {
       padding: 6px 8px;
-      cursor: pointer;
-    }
-
-    input[type="color"] {
-      width: 40px;
-      height: 32px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
       cursor: pointer;
     }
 
@@ -314,30 +296,6 @@
       text-decoration: underline;
     }
 
-    /* Styles des tableaux */
-    #editor table,
-    .display-content table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 16px 0;
-      border: 1px solid var(--border);
-    }
-
-    #editor th,
-    #editor td,
-    .display-content th,
-    .display-content td {
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    #editor th,
-    .display-content th {
-      background: var(--hover);
-      font-weight: 600;
-    }
-
     /* Images dans l'éditeur */
     #editor img,
     .display-content img {
@@ -348,108 +306,7 @@
       display: block;
     }
 
-    /* Section repliable */
-    .collapsible-section { 
-      border: 1px solid var(--border);
-      border-radius: 6px; 
-      margin: 12px 0; 
-      overflow: visible;
-      position: relative;
-    }
-    
-    .collapsible-header { 
-      cursor: pointer; 
-      display: flex; 
-      align-items: center; 
-      padding: 12px 16px;
-      user-select: none;
-      font-weight: 500;
-      border-radius: 6px 6px 0 0;
-    }
-    
-    .collapsible-header .section-title { 
-      flex: 1; 
-      outline: none; 
-      cursor: text; 
-      user-select: text;
-      display: inline-block;
-      min-width: 100px;
-    }
-    
-    .collapsible-header .section-title[contenteditable="true"] {
-      cursor: text;
-    }
-
-    .collapsible-header .section-title:focus {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-    
-    #displayMode .section-title {
-      pointer-events: none;
-      user-select: none;
-    }
-    
-    .collapsible-content { 
-      padding: 16px;
-    }
-    
-    .collapsible-section.collapsed .collapsible-content { 
-      display: none !important; 
-    }
-    
-    .collapsible-header .collapsible-arrow { 
-      margin-left: 8px; 
-      transition: transform .18s ease;
-      font-size: 12px;
-    }
-    
-    .collapsible-section.collapsed .collapsible-arrow { 
-      transform: rotate(-90deg); 
-    }
-    
-    .collapsible-header-spacer {
-      flex: 1;
-    }
-    
-    .section-delete-btn {
-      border: none;
-      background: transparent;
-      color: #6b7280;
-      cursor: pointer;
-      font-size: 13px;
-      text-decoration: underline;
-      padding: 0 4px;
-      transition: all 0.2s;
-      flex-shrink: 0;
-      font-family: inherit;
-      margin-left: 8px;
-    }
-
-    .section-delete-btn:hover {
-      color: #dc2626;
-    }
-
-    #displayMode .section-delete-btn {
-      display: none;
-    }
-
-    #displayMode .collapsible-content {
-      user-select: text;
-    }
-    
-    #displayMode .collapsible-content * {
-      pointer-events: none !important;
-    }
-
     /* Actions */
-    .config-actions {
-      margin-top: 20px;
-      display: flex;
-      gap: 12px;
-    }
-
     .btn-primary {
       padding: 10px 20px;
       background: var(--primary);
@@ -576,493 +433,307 @@
     .emoji-btn:hover {
       background: var(--hover);
     }
+  
   </style>
 </head>
 <body>
   <!-- Mode Configuration -->
-  <div id="configMode" class="config-mode" style="display: none;">
-    <div class="config-header">
-      <div class="config-actions">
-        <button class="btn-secondary" onclick="cancelEdit()">Annuler</button>
-        <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
-      </div>
-    </div>
-
+  <div id="configMode">
     <div class="toolbar">
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="execCmd('bold')" title="Gras (Ctrl+B)">
-          <strong style="font-size: 14px;">B</strong>
-        </button>
-        <button class="toolbar-btn" onclick="execCmd('italic')" title="Italique (Ctrl+I)">
-          <em style="font-size: 14px;">I</em>
-        </button>
-        <button class="toolbar-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)">
-          <u style="font-size: 14px;">U</u>
-        </button>
-        <button class="toolbar-btn" onclick="showLinkModal()" title="Ajouter un lien">
-          <span style="font-size: 16px;">🔗</span>
-        </button>
-        <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces">
-          <span style="font-size: 18px; line-height: 1;">•</span>
-        </button>
-        <div class="color-dropdown-wrapper">
-          <button class="toolbar-btn" onclick="showSectionColorPicker()" title="Section repliable">
-            <span style="font-size: 14px;">▼</span>
-          </button>
-          <div id="sectionColorDropdown" class="color-dropdown">
-            <div class="color-presets">
-              <button class="color-preset" style="background: #f3f4f6;" onclick="insertCollapsibleWithColor('rgba(243, 244, 246, 1)')" title="Gris par défaut"></button>
-              <button class="color-preset" style="background: #000000;" onclick="insertCollapsibleWithColor('rgba(0, 0, 0, 0.05)')" title="Gris"></button>
-              <button class="color-preset" style="background: #374151;" onclick="insertCollapsibleWithColor('rgba(55, 65, 81, 0.1)')" title="Gris foncé"></button>
-              <button class="color-preset" style="background: #DC2626;" onclick="insertCollapsibleWithColor('rgba(220, 38, 38, 0.15)')" title="Rouge"></button>
-              <button class="color-preset" style="background: #EF4444;" onclick="insertCollapsibleWithColor('rgba(239, 68, 68, 0.15)')" title="Rouge clair"></button>
-              <button class="color-preset" style="background: #EA580C;" onclick="insertCollapsibleWithColor('rgba(234, 88, 12, 0.15)')" title="Orange foncé"></button>
-              <button class="color-preset" style="background: #F97316;" onclick="insertCollapsibleWithColor('rgba(249, 115, 22, 0.15)')" title="Orange"></button>
-              <button class="color-preset" style="background: #F59E0B;" onclick="insertCollapsibleWithColor('rgba(245, 158, 11, 0.15)')" title="Ambre"></button>
-              <button class="color-preset" style="background: #FBBF24;" onclick="insertCollapsibleWithColor('rgba(251, 191, 36, 0.2)')" title="Jaune"></button>
-              <button class="color-preset" style="background: #84CC16;" onclick="insertCollapsibleWithColor('rgba(132, 204, 22, 0.15)')" title="Lime"></button>
-              <button class="color-preset" style="background: #10B981;" onclick="insertCollapsibleWithColor('rgba(16, 185, 129, 0.15)')" title="Vert"></button>
-              <button class="color-preset" style="background: #14B8A6;" onclick="insertCollapsibleWithColor('rgba(20, 184, 166, 0.15)')" title="Teal"></button>
-              <button class="color-preset" style="background: #06B6D4;" onclick="insertCollapsibleWithColor('rgba(6, 182, 212, 0.15)')" title="Cyan"></button>
-              <button class="color-preset" style="background: #0EA5E9;" onclick="insertCollapsibleWithColor('rgba(14, 165, 233, 0.15)')" title="Bleu ciel"></button>
-              <button class="color-preset" style="background: #3B82F6;" onclick="insertCollapsibleWithColor('rgba(59, 130, 246, 0.15)')" title="Bleu"></button>
-              <button class="color-preset" style="background: #6366F1;" onclick="insertCollapsibleWithColor('rgba(99, 102, 241, 0.15)')" title="Indigo"></button>
-              <button class="color-preset" style="background: #8B5CF6;" onclick="insertCollapsibleWithColor('rgba(139, 92, 246, 0.15)')" title="Violet"></button>
-              <button class="color-preset" style="background: #A855F7;" onclick="insertCollapsibleWithColor('rgba(168, 85, 247, 0.15)')" title="Mauve"></button>
-              <button class="color-preset" style="background: #D946EF;" onclick="insertCollapsibleWithColor('rgba(217, 70, 239, 0.15)')" title="Fuchsia"></button>
-              <button class="color-preset" style="background: #EC4899;" onclick="insertCollapsibleWithColor('rgba(236, 72, 153, 0.15)')" title="Rose"></button>
-            </div>
-          </div>
-        </div>
-        <button class="toolbar-btn" onclick="toggleEmojiPicker(event)" title="Insérer un emoji">
-          <span style="font-size: 16px;">😀</span>
-        </button>
+        <button class="toolbar-btn" onclick="document.execCommand('bold')" title="Gras"><b>B</b></button>
+        <button class="toolbar-btn" onclick="document.execCommand('italic')" title="Italique"><i>I</i></button>
+        <button class="toolbar-btn" onclick="document.execCommand('underline')" title="Souligné"><u>U</u></button>
       </div>
-
+      
       <div class="toolbar-group">
-        <select class="toolbar-btn" onchange="execCmd('formatBlock', this.value); this.selectedIndex=0;">
+        <button class="toolbar-btn" onclick="insertLink()" title="Insérer un lien">🔗</button>
+        <button class="toolbar-btn" onclick="document.execCommand('insertUnorderedList')" title="Liste à puces">• Liste</button>
+      </div>
+      
+      <div class="toolbar-group">
+        <select class="toolbar-btn" onchange="changeStyle(this.value)" title="Style de texte">
           <option value="">Style</option>
           <option value="h1">Titre 1</option>
           <option value="h2">Titre 2</option>
           <option value="h3">Titre 3</option>
           <option value="p">Paragraphe</option>
         </select>
-        <select class="toolbar-btn" id="fontSelect" onchange="applyFont(this.value)">
-          <option value="">Police</option>
-          <option value="'Marianne', sans-serif">Marianne (réservée à l'État)</option>
-          <option value="Inter, sans-serif">Inter</option>
-          <option value="'Open Sans', sans-serif">Open Sans</option>
-          <option value="Roboto, sans-serif">Roboto</option>
-          <option value="Lato, sans-serif">Lato</option>
-          <option value="Montserrat, sans-serif">Montserrat</option>
-          <option value="Raleway, sans-serif">Raleway</option>
-          <option value="Oswald, sans-serif">Oswald</option>
-          <option value="Nunito, sans-serif">Nunito</option>
-          <option value="Arial, sans-serif">Arial</option>
-          <option value="Helvetica, sans-serif">Helvetica</option>
-          <option value="Verdana, sans-serif">Verdana</option>
-          <option value="Georgia, serif">Georgia</option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-          <option value="'Courier New', monospace">Courier New</option>
+        
+        <select class="toolbar-btn" onchange="changeFont(this.value)" title="Police">
+          <option value="Marianne">Marianne</option>
+          <option value="Marianne Light">Marianne Light</option>
+          <option value="Marianne Medium">Marianne Medium</option>
+          <option value="Marianne Bold">Marianne Bold</option>
+          <option value="Marianne Light Italic">Marianne Light Italic</option>
+          <option value="Marianne Italic">Marianne Italic</option>
+          <option value="Marianne Medium Italic">Marianne Medium Italic</option>
+          <option value="Marianne Bold Italic">Marianne Bold Italic</option>
+          <option value="Inter">Inter</option>
+          <option value="Open Sans">Open Sans</option>
+          <option value="Roboto">Roboto</option>
+          <option value="Lato">Lato</option>
+          <option value="Montserrat">Montserrat</option>
+          <option value="Raleway">Raleway</option>
+          <option value="Oswald">Oswald</option>
+          <option value="Nunito">Nunito</option>
         </select>
+      </div>
+      
+      <div class="toolbar-group">
         <div class="color-dropdown-wrapper">
           <button class="toolbar-btn" onclick="toggleColorDropdown()" title="Couleur du texte">
-            <span style="color: #000000; font-weight: bold; font-size: 14px; display: inline-block; line-height: 1;" id="currentColorIcon">A</span>
+            <span style="color: #000000;">A</span>
           </button>
           <div id="colorDropdown" class="color-dropdown">
             <div class="color-presets">
-              <button class="color-preset" style="background: #000000;" onclick="applyColor('#000000')" title="Noir"></button>
-              <button class="color-preset" style="background: #374151;" onclick="applyColor('#374151')" title="Gris foncé"></button>
-              <button class="color-preset" style="background: #6B7280;" onclick="applyColor('#6B7280')" title="Gris"></button>
-              <button class="color-preset" style="background: #9CA3AF;" onclick="applyColor('#9CA3AF')" title="Gris clair"></button>
-              <button class="color-preset" style="background: #DC2626;" onclick="applyColor('#DC2626')" title="Rouge"></button>
-              <button class="color-preset" style="background: #EF4444;" onclick="applyColor('#EF4444')" title="Rouge clair"></button>
-              <button class="color-preset" style="background: #EA580C;" onclick="applyColor('#EA580C')" title="Orange foncé"></button>
-              <button class="color-preset" style="background: #F97316;" onclick="applyColor('#F97316')" title="Orange"></button>
-              <button class="color-preset" style="background: #F59E0B;" onclick="applyColor('#F59E0B')" title="Ambre"></button>
-              <button class="color-preset" style="background: #FBBF24;" onclick="applyColor('#FBBF24')" title="Jaune"></button>
-              <button class="color-preset" style="background: #84CC16;" onclick="applyColor('#84CC16')" title="Lime"></button>
-              <button class="color-preset" style="background: #10B981;" onclick="applyColor('#10B981')" title="Vert"></button>
-              <button class="color-preset" style="background: #14B8A6;" onclick="applyColor('#14B8A6')" title="Teal"></button>
-              <button class="color-preset" style="background: #06B6D4;" onclick="applyColor('#06B6D4')" title="Cyan"></button>
-              <button class="color-preset" style="background: #0EA5E9;" onclick="applyColor('#0EA5E9')" title="Bleu ciel"></button>
-              <button class="color-preset" style="background: #3B82F6;" onclick="applyColor('#3B82F6')" title="Bleu"></button>
-              <button class="color-preset" style="background: #6366F1;" onclick="applyColor('#6366F1')" title="Indigo"></button>
-              <button class="color-preset" style="background: #8B5CF6;" onclick="applyColor('#8B5CF6')" title="Violet"></button>
-              <button class="color-preset" style="background: #A855F7;" onclick="applyColor('#A855F7')" title="Mauve"></button>
-              <button class="color-preset" style="background: #D946EF;" onclick="applyColor('#D946EF')" title="Fuchsia"></button>
-              <button class="color-preset" style="background: #EC4899;" onclick="applyColor('#EC4899')" title="Rose"></button>
-            </div>
-            <div class="color-custom">
-              <input type="text" id="customColorInput" placeholder="#HEX" />
-              <button onclick="applyCustomColor()">OK</button>
+              <button class="color-preset" style="background: #000000;" onclick="applyTextColor('#000000')" title="Noir"></button>
+              <button class="color-preset" style="background: #6B7280;" onclick="applyTextColor('#6B7280')" title="Gris"></button>
+              <button class="color-preset" style="background: #DC2626;" onclick="applyTextColor('#DC2626')" title="Rouge"></button>
+              <button class="color-preset" style="background: #EA580C;" onclick="applyTextColor('#EA580C')" title="Orange"></button>
+              <button class="color-preset" style="background: #F59E0B;" onclick="applyTextColor('#F59E0B')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FBBF24;" onclick="applyTextColor('#FBBF24')" title="Jaune"></button>
+              <button class="color-preset" style="background: #84CC16;" onclick="applyTextColor('#84CC16')" title="Lime"></button>
+              <button class="color-preset" style="background: #10B981;" onclick="applyTextColor('#10B981')" title="Vert"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyTextColor('#14B8A6')" title="Teal"></button>
+              <button class="color-preset" style="background: #06B6D4;" onclick="applyTextColor('#06B6D4')" title="Cyan"></button>
+              <button class="color-preset" style="background: #0EA5E9;" onclick="applyTextColor('#0EA5E9')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #3B82F6;" onclick="applyTextColor('#3B82F6')" title="Bleu"></button>
+              <button class="color-preset" style="background: #6366F1;" onclick="applyTextColor('#6366F1')" title="Indigo"></button>
+              <button class="color-preset" style="background: #8B5CF6;" onclick="applyTextColor('#8B5CF6')" title="Violet"></button>
+              <button class="color-preset" style="background: #A855F7;" onclick="applyTextColor('#A855F7')" title="Mauve"></button>
+              <button class="color-preset" style="background: #D946EF;" onclick="applyTextColor('#D946EF')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #EC4899;" onclick="applyTextColor('#EC4899')" title="Rose"></button>
+              <button class="color-preset" style="background: #F97316;" onclick="applyTextColor('#F97316')" title="Orange vif"></button>
+              <button class="color-preset" style="background: #EAB308;" onclick="applyTextColor('#EAB308')" title="Jaune vif"></button>
+              <button class="color-preset" style="background: #22C55E;" onclick="applyTextColor('#22C55E')" title="Vert vif"></button>
+              <button class="color-preset" style="background: #14B8A6;" onclick="applyTextColor('#14B8A6')" title="Cyan vif"></button>
             </div>
           </div>
         </div>
-
+        
         <div class="color-dropdown-wrapper">
-          <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de fond du texte">
-            <span style="background: rgba(255, 255, 0, 0.3); padding: 2px 6px; font-weight: bold; font-size: 14px; display: inline-block; line-height: 1;" id="currentBgColorIcon">A</span>
+          <button class="toolbar-btn" onclick="toggleBgColorDropdown()" title="Couleur de surbrillance">
+            <span style="background: #FBBF24; padding: 2px 4px; border-radius: 2px;">A</span>
           </button>
           <div id="bgColorDropdown" class="color-dropdown">
             <div class="color-presets">
-              <button class="color-preset" style="background: #000000;" onclick="applyBgColor('rgba(0, 0, 0, 0.1)')" title="Gris"></button>
-              <button class="color-preset" style="background: #374151;" onclick="applyBgColor('rgba(55, 65, 81, 0.15)')" title="Gris foncé"></button>
-              <button class="color-preset" style="background: #6B7280;" onclick="applyBgColor('rgba(107, 114, 128, 0.15)')" title="Gris moyen"></button>
-              <button class="color-preset" style="background: #9CA3AF;" onclick="applyBgColor('rgba(156, 163, 175, 0.2)')" title="Gris clair"></button>
-              <button class="color-preset" style="background: #DC2626;" onclick="applyBgColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
-              <button class="color-preset" style="background: #EF4444;" onclick="applyBgColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
-              <button class="color-preset" style="background: #EA580C;" onclick="applyBgColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
-              <button class="color-preset" style="background: #F97316;" onclick="applyBgColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
-              <button class="color-preset" style="background: #F59E0B;" onclick="applyBgColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
-              <button class="color-preset" style="background: #FBBF24;" onclick="applyBgColor('rgba(251, 191, 36, 0.3)')" title="Jaune"></button>
-              <button class="color-preset" style="background: #84CC16;" onclick="applyBgColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
-              <button class="color-preset" style="background: #10B981;" onclick="applyBgColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
-              <button class="color-preset" style="background: #14B8A6;" onclick="applyBgColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
-              <button class="color-preset" style="background: #06B6D4;" onclick="applyBgColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
-              <button class="color-preset" style="background: #0EA5E9;" onclick="applyBgColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
-              <button class="color-preset" style="background: #3B82F6;" onclick="applyBgColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
-              <button class="color-preset" style="background: #6366F1;" onclick="applyBgColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
-              <button class="color-preset" style="background: #8B5CF6;" onclick="applyBgColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
-              <button class="color-preset" style="background: #A855F7;" onclick="applyBgColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
-              <button class="color-preset" style="background: #D946EF;" onclick="applyBgColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
-              <button class="color-preset" style="background: #EC4899;" onclick="applyBgColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
-            </div>
-            <div class="color-custom">
-              <input type="text" id="customBgColorInput" placeholder="#HEX" />
-              <button onclick="applyCustomBgColor()">OK</button>
+              <button class="color-preset" style="background: #E5E5E5;" onclick="applyHighlightColor('rgba(0, 0, 0, 0.05)')" title="Gris"></button>
+              <button class="color-preset" style="background: #D1D5DB;" onclick="applyHighlightColor('rgba(55, 65, 81, 0.1)')" title="Gris foncé"></button>
+              <button class="color-preset" style="background: #FEE2E2;" onclick="applyHighlightColor('rgba(220, 38, 38, 0.2)')" title="Rouge"></button>
+              <button class="color-preset" style="background: #FECACA;" onclick="applyHighlightColor('rgba(239, 68, 68, 0.2)')" title="Rouge clair"></button>
+              <button class="color-preset" style="background: #FFEDD5;" onclick="applyHighlightColor('rgba(234, 88, 12, 0.2)')" title="Orange foncé"></button>
+              <button class="color-preset" style="background: #FED7AA;" onclick="applyHighlightColor('rgba(249, 115, 22, 0.2)')" title="Orange"></button>
+              <button class="color-preset" style="background: #FDE68A;" onclick="applyHighlightColor('rgba(245, 158, 11, 0.2)')" title="Ambre"></button>
+              <button class="color-preset" style="background: #FEF3C7;" onclick="applyHighlightColor('rgba(251, 191, 36, 0.2)')" title="Jaune"></button>
+              <button class="color-preset" style="background: #ECFCCB;" onclick="applyHighlightColor('rgba(132, 204, 22, 0.2)')" title="Lime"></button>
+              <button class="color-preset" style="background: #D1FAE5;" onclick="applyHighlightColor('rgba(16, 185, 129, 0.2)')" title="Vert"></button>
+              <button class="color-preset" style="background: #CCFBF1;" onclick="applyHighlightColor('rgba(20, 184, 166, 0.2)')" title="Teal"></button>
+              <button class="color-preset" style="background: #CFFAFE;" onclick="applyHighlightColor('rgba(6, 182, 212, 0.2)')" title="Cyan"></button>
+              <button class="color-preset" style="background: #DBEAFE;" onclick="applyHighlightColor('rgba(14, 165, 233, 0.2)')" title="Bleu ciel"></button>
+              <button class="color-preset" style="background: #DBEAFE;" onclick="applyHighlightColor('rgba(59, 130, 246, 0.2)')" title="Bleu"></button>
+              <button class="color-preset" style="background: #E0E7FF;" onclick="applyHighlightColor('rgba(99, 102, 241, 0.2)')" title="Indigo"></button>
+              <button class="color-preset" style="background: #EDE9FE;" onclick="applyHighlightColor('rgba(139, 92, 246, 0.2)')" title="Violet"></button>
+              <button class="color-preset" style="background: #F3E8FF;" onclick="applyHighlightColor('rgba(168, 85, 247, 0.2)')" title="Mauve"></button>
+              <button class="color-preset" style="background: #FAE8FF;" onclick="applyHighlightColor('rgba(217, 70, 239, 0.2)')" title="Fuchsia"></button>
+              <button class="color-preset" style="background: #FCE7F3;" onclick="applyHighlightColor('rgba(236, 72, 153, 0.2)')" title="Rose"></button>
             </div>
           </div>
         </div>
       </div>
-
+      
       <div class="toolbar-group">
-        <select class="toolbar-btn" id="paddingSelect" onchange="applyPadding(this.value)">
-          <option value="">Marges</option>
-          <option value="small">Petites</option>
-          <option value="medium">Moyennes</option>
-          <option value="large">Grandes</option>
+        <div class="emoji-wrapper">
+          <button class="toolbar-btn" onclick="toggleEmojiPicker()" title="Emoji">😀</button>
+          <div id="emojiPicker" class="emoji-picker"></div>
+        </div>
+      </div>
+      
+      <div class="toolbar-group">
+        <select class="toolbar-btn" onchange="changePadding(this.value)" title="Espacement">
+          <option value="small">Petit</option>
+          <option value="medium" selected>Moyen</option>
+          <option value="large">Grand</option>
         </select>
       </div>
     </div>
 
-    <div class="editor-container">
-      <div id="editor" contenteditable="true" data-placeholder="Commencez à écrire..."></div>
+    <div id="editor" contenteditable="true" class="padding-medium">
+      <p>Commencez à écrire...</p>
     </div>
 
-    <!-- Emoji Picker -->
-    <div id="emojiPicker" class="emoji-picker"></div>
+    <div class="actions">
+      <button class="btn-primary" onclick="saveContent()">Enregistrer</button>
+      <button class="btn-secondary" onclick="switchToDisplay()">Afficher</button>
+    </div>
   </div>
 
   <!-- Mode Display -->
-  <div id="displayMode" class="display-mode">
-    <div id="displayContent" class="display-content"></div>
+  <div id="displayMode" style="display: none;">
+    <div class="display-mode">
+      <div class="display-content padding-medium"></div>
+      <div class="actions" style="margin-top: 20px;">
+        <button class="btn-secondary" onclick="switchToConfig()">Modifier</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal pour les liens -->
   <div id="linkModal" class="modal">
     <div class="modal-content">
-      <h3>Ajouter un lien</h3>
-      <input type="text" id="linkText" placeholder="Texte du lien">
-      <input type="url" id="linkUrl" placeholder="https://exemple.com">
-      <div class="modal-actions">
-        <button class="btn-secondary" onclick="closeLinkModal()">Annuler</button>
-        <button class="btn-primary" onclick="insertLink()">Insérer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal pour les images -->
-  <div id="imageModal" class="modal">
-    <div class="modal-content">
-      <h3>Ajouter une image</h3>
-      <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">
-        URL de l'image ou encodage base64
-      </p>
-      <input type="text" id="imageUrl" placeholder="https://exemple.com/image.jpg ou data:image/...">
-      <div class="modal-actions">
-        <button class="btn-secondary" onclick="closeImageModal()">Annuler</button>
-        <button class="btn-primary" onclick="insertImage()">Insérer</button>
+      <h3>Insérer un lien</h3>
+      <input type="text" id="linkText" placeholder="Texte à afficher" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+      <input type="url" id="linkUrl" placeholder="https://example.com" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn-primary" onclick="confirmLink()">Insérer</button>
+        <button class="btn-secondary" onclick="cancelLink()">Annuler</button>
       </div>
     </div>
   </div>
 
   <script>
-    let currentContent = '';
-    const configMode = document.getElementById('configMode');
-    const displayMode = document.getElementById('displayMode');
-    
+    let currentRecord = null;
+    let isReady = false;
+
     // Emojis professionnels
-    // Gestion déléguée des sections repliables - UNE SEULE FOIS
-    let collapsibleDelegationAdded = false;
+    const professionalEmojis = [
+      '✅', '❌', '⚠️', '🔔', '📌', '🔖', '🏆', '💡', 
+      '📊', '📈', '📉', '💰', '💵', '💳', '📝', '📋',
+      '📁', '📂', '🗂️', '📄', '📃', '📑', '📜', '🗃️',
+      '🔍', '🔎', '🔧', '🔨', '⚙️', '🛠️', '🔩', '⚡',
+      '🎯', '🎪', '🎨', '🎭', '🎬', '🎤', '🎧', '🎵',
+      '📞', '📱', '💻', '🖥️', '⌨️', '🖱️', '🖨️', '📷',
+      '🏢', '🏦', '🏪', '🏬', '🏭', '🏗️', '🏛️', '⛪',
+      '🚀', '✈️', '🚁', '🚂', '🚗', '🚕', '🚙', '🚌',
+      '⏰', '⏱️', '⏲️', '⏳', '📅', '📆', '🗓️', '📇',
+      '👤', '👥', '👨‍💼', '👩‍💼', '👨‍🔬', '👩‍🔬', '👨‍💻', '👩‍💻',
+      '🌍', '🌎', '🌏', '🌐', '🗺️', '🧭', '⛰️', '🏔️',
+      '☀️', '🌙', '⭐', '✨', '🔥', '💧', '🌊', '⛅'
+    ];
 
-    function ensureCollapsibleDelegation() {
-      if (collapsibleDelegationAdded) return;
-      const editor = document.getElementById('editor');
-      if (!editor) return;
-      
-      editor.addEventListener('click', function(e) {
-        // Gestion du toggle de section
-        const header = e.target.closest('.collapsible-header');
-        if (header) {
-          // Si on clique dans le titre éditable ou sur le bouton supprimer => ne pas toggle
-          if (e.target.closest('.section-title') || e.target.closest('.section-delete-btn')) {
-            return;
-          }
-
-          const section = header.closest('.collapsible-section');
-          if (section) {
-            section.classList.toggle('collapsed');
-          }
-          return;
-        }
-        
-        // Gestion de la suppression
-        const deleteBtn = e.target.closest('.section-delete-btn');
-        if (deleteBtn) {
-          e.stopPropagation();
-          const section = deleteBtn.closest('.collapsible-section');
-          if (section) section.remove();
-        }
-      });
-      
-      collapsibleDelegationAdded = true;
-    }
-
-        const emojis = [
-      '😀', '😃', '😄', '😁', '😊', '😍', '🥰', '😘',
-      '😂', '🤣', '😉', '😎', '🤔', '😐', '😑', '😶',
-      '🙄', '😮', '😯', '😲', '😳', '🥺', '😢', '😭',
-      '😤', '😠', '😡', '🤬', '😱', '😨', '😰', '😥',
-      '🤝', '👍', '👎', '👏', '🙏', '💪', '✊', '👊',
-      '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '💔',
-      '📊', '📈', '📉', '💼', '🏢', '🏭', '🏗️', '⚙️',
-      '🔧', '🔨', '🛠️', '📋', '📌', '📍', '📎', '✂️',
-      '📁', '📂', '🗂️', '📅', '📆', '🗓️', '⏰', '⏱️',
-      '✅', '❌', '⚠️', '⛔', '🚫', '💡', '🔔', '📢',
-      '🎯', '🎓', '🏆', '🥇', '🥈', '🥉', '⭐', '✨',
-      '🔍', '🔎', '📝', '✏️', '📧', '📨', '💬', '💭'
-    ]
-
-    // Initialisation de Grist
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initGrist);
-    } else {
-      initGrist();
-    }
-
-    function initGrist() {
-      // Initialiser la délégation des événements une seule fois
-      ensureCollapsibleDelegation();
-      
-      grist.ready({ 
-        requiredAccess: 'read table',
-        onEditOptions: async () => {
-          // Mode configuration
-          configMode.style.display = 'block';
-          displayMode.style.display = 'none';
-          
-          // Charger le contenu existant
-          const options = await grist.getOptions();
-          const savedContent = options?.content || '';
-          const savedFont = options?.font || '';
-          const savedPadding = options?.padding || '';
-          
-          document.getElementById('editor').innerHTML = savedContent;
-          currentContent = savedContent;
-          
-          // Restaurer police et marges
-          if (savedFont) {
-            currentFont = savedFont;
-            applyFont(savedFont);
-          }
-          
-          if (savedPadding) {
-            currentPadding = savedPadding;
-            applyPadding(savedPadding);
-          }
-          
-          // Réinitialiser les sections en mode config aussi
-          initCollapsibles();
-          
-          initializeEmojiPicker();
-        }
-      });
-      
-      grist.onRecords(async (records) => {
-        // Mode affichage
-        if (configMode.style.display === 'none') {
-          const options = await grist.getOptions();
-          const content = options?.content || '<p>Cliquez sur "Ouvrir la configuration" pour éditer le texte.</p>';
-          const savedFont = options?.font || '';
-          const savedPadding = options?.padding || '';
-          
-          document.getElementById('displayContent').innerHTML = content;
-          
-          // Appliquer police et marges en mode affichage
-          if (savedFont) {
-            document.getElementById('displayContent').style.fontFamily = savedFont;
-          }
-          
-          if (savedPadding) {
-            let padding;
-            switch(savedPadding) {
-              case 'small': padding = '10px'; break;
-              case 'medium': padding = '20px'; break;
-              case 'large': padding = '40px'; break;
-            }
-            if (padding) {
-              document.getElementById('displayContent').style.padding = padding;
-            }
-          }
-          
-          // Réinitialiser les sections repliables
-          initCollapsibles();
-        }
+    // Initialiser le picker d'émojis
+    function initEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.innerHTML = '';
+      professionalEmojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'emoji-btn';
+        btn.textContent = emoji;
+        btn.onclick = () => insertEmoji(emoji);
+        picker.appendChild(btn);
       });
     }
 
-    // Commandes d'édition
-    function execCmd(command, value = null) {
+    function toggleEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.classList.toggle('active');
+    }
+
+    function insertEmoji(emoji) {
+      document.execCommand('insertText', false, emoji);
+      document.getElementById('emojiPicker').classList.remove('active');
       document.getElementById('editor').focus();
-      document.execCommand(command, false, value);
     }
 
-    // Gestion des liens
-    let savedSelection = null;
-    
-    function showLinkModal() {
-      // Sauvegarder la sélection actuelle
-      savedSelection = saveSelection();
-      
-      document.getElementById('linkModal').classList.add('active');
-      document.getElementById('linkText').value = '';
-      document.getElementById('linkUrl').value = '';
-      
-      // Pré-remplir avec la sélection si c'est du texte
-      const selection = window.getSelection();
-      if (selection.toString()) {
-        document.getElementById('linkText').value = selection.toString();
-      }
-      
-      document.getElementById('linkText').focus();
-    }
-
-    function closeLinkModal() {
-      document.getElementById('linkModal').classList.remove('active');
-      savedSelection = null;
-    }
-
-    function saveSelection() {
-      if (window.getSelection) {
-        const sel = window.getSelection();
-        if (sel.getRangeAt && sel.rangeCount) {
-          return sel.getRangeAt(0);
-        }
-      }
-      return null;
-    }
-
-    function restoreSelection(range) {
-      if (range) {
-        if (window.getSelection) {
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      }
-    }
-
-    function insertLink() {
-      const text = document.getElementById('linkText').value.trim();
-      let url = document.getElementById('linkUrl').value.trim();
-      
-      if (text && url) {
-        // Ajouter https:// si aucun protocole n'est spécifié
-        if (!url.match(/^https?:\/\//i)) {
-          url = 'https://' + url;
-        }
-        
-        const editor = document.getElementById('editor');
-        editor.focus();
-        
-        // Restaurer la sélection si elle existe
-        if (savedSelection) {
-          restoreSelection(savedSelection);
-        }
-        
-        const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-        document.execCommand('insertHTML', false, link);
-        
-        closeLinkModal();
-      }
-    }
-
-    // Gestion du color dropdown
     function toggleColorDropdown() {
       const dropdown = document.getElementById('colorDropdown');
-      const bgDropdown = document.getElementById('bgColorDropdown');
-      bgDropdown.classList.remove('active');
       dropdown.classList.toggle('active');
     }
 
-    function applyColor(color) {
-      document.getElementById('editor').focus();
+    function toggleBgColorDropdown() {
+      const dropdown = document.getElementById('bgColorDropdown');
+      dropdown.classList.toggle('active');
+    }
+
+    function applyTextColor(color) {
       document.execCommand('foreColor', false, color);
-      document.getElementById('currentColorIcon').style.color = color;
       document.getElementById('colorDropdown').classList.remove('active');
     }
 
-    function applyCustomColor() {
-      const input = document.getElementById('customColorInput');
-      const color = input.value.trim();
-      
-      if (color) {
-        applyColor(color);
-        input.value = '';
-      }
-    }
-
-    // Gestion du background color dropdown
-    function toggleBgColorDropdown() {
-      const dropdown = document.getElementById('bgColorDropdown');
-      const colorDropdown = document.getElementById('colorDropdown');
-      colorDropdown.classList.remove('active');
-      dropdown.classList.toggle('active');
-    }
-
-    function applyBgColor(color) {
-      document.getElementById('editor').focus();
-      document.execCommand('backColor', false, color);
-      document.getElementById('currentBgColorIcon').style.background = color;
+    function applyHighlightColor(color) {
+      document.execCommand('hiliteColor', false, color);
       document.getElementById('bgColorDropdown').classList.remove('active');
     }
 
-    function applyCustomBgColor() {
-      const input = document.getElementById('customBgColorInput');
-      let color = input.value.trim();
-      
-      if (color) {
-        // Convertir hex en rgba si nécessaire
-        if (color.match(/^#[0-9A-F]{6}$/i)) {
-          const r = parseInt(color.slice(1, 3), 16);
-          const g = parseInt(color.slice(3, 5), 16);
-          const b = parseInt(color.slice(5, 7), 16);
-          color = `rgba(${r}, ${g}, ${b}, 0.2)`;
-        }
-        applyBgColor(color);
-        input.value = '';
+    function changeStyle(tag) {
+      if (tag) {
+        document.execCommand('formatBlock', false, tag);
       }
+    }
+
+    function changeFont(font) {
+      document.execCommand('fontName', false, font);
+    }
+
+    function changePadding(size) {
+      const editor = document.getElementById('editor');
+      const display = document.querySelector('.display-content');
+      
+      editor.classList.remove('padding-small', 'padding-medium', 'padding-large');
+      display.classList.remove('padding-small', 'padding-medium', 'padding-large');
+      
+      editor.classList.add('padding-' + size);
+      display.classList.add('padding-' + size);
+    }
+
+    function insertLink() {
+      const selection = window.getSelection();
+      const selectedText = selection.toString();
+      
+      document.getElementById('linkText').value = selectedText;
+      document.getElementById('linkUrl').value = '';
+      document.getElementById('linkModal').classList.add('active');
+    }
+
+    function confirmLink() {
+      const text = document.getElementById('linkText').value;
+      const url = document.getElementById('linkUrl').value;
+      
+      if (text && url) {
+        const link = `<a href="${url}" target="_blank">${text}</a>`;
+        document.execCommand('insertHTML', false, link);
+      }
+      
+      cancelLink();
+    }
+
+    function cancelLink() {
+      document.getElementById('linkModal').classList.remove('active');
+    }
+
+    function saveContent() {
+      const content = document.getElementById('editor').innerHTML;
+      const paddingClass = document.getElementById('editor').className.match(/padding-\w+/);
+      const padding = paddingClass ? paddingClass[0].replace('padding-', '') : 'medium';
+      
+      if (isReady && currentRecord) {
+        grist.setOption('content', content);
+        grist.setOption('padding', padding);
+        alert('Contenu enregistré !');
+      }
+    }
+
+    function switchToDisplay() {
+      const content = document.getElementById('editor').innerHTML;
+      document.querySelector('.display-content').innerHTML = content;
+      
+      document.getElementById('configMode').style.display = 'none';
+      document.getElementById('displayMode').style.display = 'block';
+    }
+
+    function switchToConfig() {
+      document.getElementById('configMode').style.display = 'block';
+      document.getElementById('displayMode').style.display = 'none';
     }
 
     // Fermer les dropdowns si on clique ailleurs
     document.addEventListener('click', function(e) {
       const colorDropdown = document.getElementById('colorDropdown');
       const bgColorDropdown = document.getElementById('bgColorDropdown');
-      const sectionColorDropdown = document.getElementById('sectionColorDropdown');
+      const emojiPicker = document.getElementById('emojiPicker');
       const colorBtn = e.target.closest('[onclick*="toggleColorDropdown"]');
       const bgColorBtn = e.target.closest('[onclick*="toggleBgColorDropdown"]');
-      const sectionBtn = e.target.closest('[onclick*="showSectionColorPicker"]');
+      const emojiBtn = e.target.closest('[onclick*="toggleEmojiPicker"]');
       
       if (colorDropdown && !colorDropdown.contains(e.target) && !colorBtn) {
         colorDropdown.classList.remove('active');
@@ -1072,286 +743,64 @@
         bgColorDropdown.classList.remove('active');
       }
       
-      if (sectionColorDropdown && !sectionColorDropdown.contains(e.target) && !sectionBtn) {
-        sectionColorDropdown.classList.remove('active');
+      if (emojiPicker && !emojiPicker.contains(e.target) && !emojiBtn) {
+        emojiPicker.classList.remove('active');
       }
     });
 
-    // Gestion de la police (applique à tout le texte)
-    let currentFont = '';
-    
-    function applyFont(font) {
-      if (!font) return;
-      
-      const editor = document.getElementById('editor');
-      const displayContent = document.getElementById('displayContent');
-      
-      // Appliquer la police directement au conteneur
-      editor.style.fontFamily = font;
-      displayContent.style.fontFamily = font;
-      
-      // Pour appliquer aussi au contenu existant, on wrapp tout dans un span
-      // mais seulement si c'est lors de l'édition
-      if (editor.innerHTML && editor.style.display !== 'none') {
-        // Nettoyer les anciens spans de police
-        const content = editor.innerHTML;
-        editor.innerHTML = content;
-      }
-      
-      currentFont = font;
-      
-      // Mettre à jour le select
-      const fontSelect = document.getElementById('fontSelect');
-      if (fontSelect) {
-        fontSelect.value = font;
-      }
-    }
+    // Initialisation Grist
+    grist.ready({
+      requiredAccess: 'full',
+      columns: [
+        {
+          name: 'content',
+          title: 'Contenu',
+          type: 'Text',
+          optional: true
+        },
+        {
+          name: 'padding',
+          title: 'Espacement',
+          type: 'Text',
+          optional: true
+        }
+      ]
+    });
 
-    // Gestion des marges
-    let currentPadding = '';
-    
-    function applyPadding(size) {
-      if (!size) return;
+    grist.onRecord(function(record) {
+      currentRecord = record;
       
-      const editor = document.getElementById('editor');
-      const displayContent = document.getElementById('displayContent');
+      const content = grist.getOption('content') || record.content || '<p>Commencez à écrire...</p>';
+      const padding = grist.getOption('padding') || record.padding || 'medium';
       
-      let padding;
-      switch(size) {
-        case 'small':
-          padding = '10px';
-          break;
-        case 'medium':
-          padding = '20px';
-          break;
-        case 'large':
-          padding = '40px';
-          break;
-        default:
-          return;
-      }
+      document.getElementById('editor').innerHTML = content;
+      document.querySelector('.display-content').innerHTML = content;
       
-      editor.style.padding = padding;
-      displayContent.style.padding = padding;
+      changePadding(padding);
       
-      currentPadding = size;
-      document.getElementById('paddingSelect').value = size;
-    }
-
-    // Gestion des emojis
-    function initializeEmojiPicker() {
-      const picker = document.getElementById('emojiPicker');
-      picker.innerHTML = '';
-      
-      emojis.forEach(emoji => {
-        const btn = document.createElement('button');
-        btn.className = 'emoji-btn';
-        btn.textContent = emoji;
-        btn.onclick = () => insertEmoji(emoji);
-        picker.appendChild(btn);
-      });
-    }
-
-    function toggleEmojiPicker(event) {
-      const picker = document.getElementById('emojiPicker');
-      
-      if (picker.classList.contains('active')) {
-        picker.classList.remove('active');
-      } else {
-        const btn = event.target.closest('.toolbar-btn');
-        const rect = btn.getBoundingClientRect();
-        
-        picker.style.top = (rect.bottom + 4) + 'px';
-        picker.style.right = '12px';
-        picker.style.left = 'auto';
-        
-        picker.classList.add('active');
-      }
-    }
-
-    function insertEmoji(emoji) {
-      document.execCommand('insertText', false, emoji);
-      document.getElementById('emojiPicker').classList.remove('active');
-      document.getElementById('editor').focus();
-    }
-
-    // Fermer l'emoji picker si on clique ailleurs
-    document.addEventListener('click', function(e) {
-      const picker = document.getElementById('emojiPicker');
-      const emojiBtn = event.target.closest('[onclick*="toggleEmojiPicker"]');
-      
-      if (!picker.contains(e.target) && !emojiBtn) {
-        picker.classList.remove('active');
+      const paddingSelect = document.querySelector('select[onchange*="changePadding"]');
+      if (paddingSelect) {
+        paddingSelect.value = padding;
       }
     });
 
-    // Section repliable
-    let selectedSectionColor = '';
-
-    function showSectionColorPicker() {
-      const dropdown = document.getElementById('sectionColorDropdown');
-      dropdown.classList.toggle('active');
-    }
-
-    function insertCollapsibleWithColor(color) {
-      selectedSectionColor = color;
-      insertCollapsible();
-      document.getElementById('sectionColorDropdown').classList.remove('active');
-    }
-
-
-    function insertCollapsible() {
-      const bgColor = selectedSectionColor || 'rgba(243, 244, 246, 1)';
-      const sectionHTML = `<div class="collapsible-section" contenteditable="false">
-          <div class="collapsible-header" style="background-color: ${bgColor};">
-            <span class="section-title" contenteditable="true">Titre de la section</span>
-            <span class="collapsible-header-spacer"></span>
-            <button class="section-delete-btn" title="Supprimer la section">Supprimer</button>
-            <span class="collapsible-arrow">▼</span>
-          </div>
-          <div class="collapsible-content" contenteditable="true">
-            <p>Contenu de la section...</p>
-          </div>
-        </div>
-        <p><br></p>`;
-      
-      selectedSectionColor = '';
-      
-      // Insérer proprement
-      const editor = document.getElementById('editor');
-      editor.insertAdjacentHTML('beforeend', sectionHTML);
-      
-      // Repositionner le curseur après la nouvelle section
-      const sections = editor.querySelectorAll('.collapsible-section');
-      const lastSection = sections[sections.length - 1];
-      if (lastSection && lastSection.nextElementSibling) {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.setStart(lastSection.nextElementSibling, 0);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
+    grist.onOptions(function(options) {
+      if (options.content !== undefined) {
+        document.getElementById('editor').innerHTML = options.content;
+        document.querySelector('.display-content').innerHTML = options.content;
       }
-      
-      // Petit timeout pour laisser le DOM se stabiliser
-      setTimeout(() => {
-        initCollapsibles();
-      }, 30);
-    }
-
-        function toggleCollapsible(event) {
-      // Ne pas toggle si on clique sur le titre éditable ou le bouton supprimer
-      if (event.target.classList.contains('section-title') || 
-          event.target.classList.contains('section-delete-btn')) {
-        return;
-      }
-      const header = event.currentTarget;
-      const section = header.closest('.collapsible-section');
-      if (section) {
-        section.classList.toggle('collapsed');
-      }
-    }
-
-function initCollapsibles() {
-      const headers = document.querySelectorAll('.collapsible-header');
-      headers.forEach(header => {
-        header.onclick = function(e) {
-          toggleCollapsible(e);
-        };
-      });
-      
-      // Gérer l'édition du titre et du contenu en mode config
-      const configMode = document.getElementById('configMode');
-      const isConfigMode = configMode && configMode.style.display !== 'none';
-      
-      document.querySelectorAll('.section-title').forEach(title => {
-        if (isConfigMode) {
-          title.setAttribute('contenteditable', 'true');
-        } else {
-          title.removeAttribute('contenteditable');
-        }
-      });
-      
-      document.querySelectorAll('.collapsible-content').forEach(content => {
-        if (isConfigMode) {
-          content.setAttribute('contenteditable', 'true');
-          content.style.pointerEvents = '';
-        } else {
-          content.setAttribute('contenteditable', 'false');
-          content.style.pointerEvents = 'none';
-        }
-      });
-    }
-
-    // Sauvegarde
-    async function saveContent() {
-      const content = document.getElementById('editor').innerHTML;
-      
-      await grist.setOptions({
-        content: content,
-        font: currentFont,
-        padding: currentPadding
-      });
-      
-      // Retour au mode affichage
-      document.getElementById('configMode').style.display = 'none';
-      document.getElementById('displayMode').style.display = 'block';
-      document.getElementById('displayContent').innerHTML = content;
-      
-      // Appliquer police et marges en mode affichage
-      if (currentFont) {
-        document.getElementById('displayContent').style.fontFamily = currentFont;
-      }
-      
-      if (currentPadding) {
-        let padding;
-        switch(currentPadding) {
-          case 'small': padding = '10px'; break;
-          case 'medium': padding = '20px'; break;
-          case 'large': padding = '40px'; break;
-        }
-        if (padding) {
-          document.getElementById('displayContent').style.padding = padding;
+      if (options.padding !== undefined) {
+        changePadding(options.padding);
+        const paddingSelect = document.querySelector('select[onchange*="changePadding"]');
+        if (paddingSelect) {
+          paddingSelect.value = options.padding;
         }
       }
-      
-      initCollapsibles();
-    }
-
-    function cancelEdit() {
-      // Restaurer le contenu original
-      document.getElementById('editor').innerHTML = currentContent;
-      
-      // Retour au mode affichage
-      document.getElementById('configMode').style.display = 'none';
-      document.getElementById('displayMode').style.display = 'block';
-    }
-
-
-    // Raccourcis clavier
-    document.addEventListener('keydown', function(e) {
-      if (e.ctrlKey || e.metaKey) {
-        switch(e.key.toLowerCase()) {
-          case 'b':
-            e.preventDefault();
-            execCmd('bold');
-            break;
-          case 'i':
-            e.preventDefault();
-            execCmd('italic');
-            break;
-          case 'u':
-            e.preventDefault();
-            execCmd('underline');
-            break;
-        }
-      }
+      isReady = true;
     });
 
-    // Initialisation au chargement
-    window.addEventListener('load', function() {
-      initializeEmojiPicker();
-    });
+    // Initialiser les emojis au chargement
+    initEmojiPicker();
   </script>
 </body>
 </html>
