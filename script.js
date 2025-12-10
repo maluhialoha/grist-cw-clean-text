@@ -466,3 +466,18 @@ document.addEventListener('keydown', function (e) {
 window.addEventListener('load', function () {
   initializeEmojiPicker();
 });
+
+// Double-clic sur un lien dans l'éditeur = ouvrir la modale d'édition de lien
+document.getElementById('editor').addEventListener('dblclick', function (e) {
+  const link = e.target.closest('a');
+  if (!link) return;
+
+  // Sélectionner le lien pour que showLinkModal le détecte
+  const range = document.createRange();
+  range.selectNodeContents(link);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  showLinkModal(); // ouvre la fenêtre d’édition
+});
