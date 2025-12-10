@@ -167,11 +167,15 @@ function restoreSelection(range) {
 function insertLink() {
   const text = document.getElementById('linkText').value.trim();
   let url = document.getElementById('linkUrl').value.trim();
+  const errorEl = document.getElementById('linkError');
 
-  if (!text || !url) return;
+  // Nettoyer une éventuelle erreur précédente
+  if (errorEl) errorEl.textContent = '';
 
-  if (!url.match(/^https?:\/\//)) {
-    url = 'https://' + url;
+  // Si le texte est vide → erreur
+  if (!text) {
+    if (errorEl) errorEl.textContent = "Ce champ est obligatoire";
+    return;
   }
 
   const modal = document.getElementById('linkModal');
@@ -180,10 +184,11 @@ function insertLink() {
   const editor = document.getElementById('editor');
   editor.focus();
 
-  if (isEdit) {
-    // Mode modification
-    restoreSelection(savedSelection);
+  restoreSelection(savedSelection);
 
+  // MODE MODIFICATION
+  if (isEdit) {
+    // retrouver le lien existant
     let existingLink = null;
     let node = savedSelection.startContainer;
     while (node && node !== document) {
@@ -195,21 +200,47 @@ function insertLink() {
     }
 
     if (existingLink) {
-      existingLink.textContent = text;
-      existingLink.href = url;
+      if (!url) {
+        // URL vide → supprimer le lien
+        const span = document.createElement("span");
+        span.textContent = text;
+        existingLink.replaceWith(span);
+      } else {
+        // normaliser l’URL
+        if (!url.match(/^https?:\/\//)) url = 'https://' + url;
+
+        existingLink.textContent = text;
+        existingLink.href = url;
+      }
     }
-  } else {
-    // Nouveau lien
-    restoreSelection(savedSelection);
-    document.execCommand(
-      'insertHTML',
-      false,
-      `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
-    );
+
+    closeLinkModal();
+    return;
   }
+
+  // MODE CRÉATION
+  if (!url) {
+    // URL vide → insérer le texte simple, sans lien
+    document.execCommand('insertText', false, text);
+    closeLinkModal();
+    return;
+  }
+
+  // Normaliser l’URL
+  if (!url.match(/^https?:\/\//)) {
+    url = 'https://' + url;
+  }
+
+  // Insérer un nouveau lien
+  document.execCommand(
+    'insertHTML',
+    false,
+    `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
+  );
 
   closeLinkModal();
 }
+
 
 // Gestion du color dropdown
 function toggleColorDropdown() {
